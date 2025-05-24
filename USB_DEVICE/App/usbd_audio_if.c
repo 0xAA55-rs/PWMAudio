@@ -170,6 +170,7 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
 static int8_t AUDIO_DeInit_FS(uint32_t options)
 {
   /* USER CODE BEGIN 1 */
+  Main_StopPlay();
   return (USBD_OK);
   /* USER CODE END 1 */
 }
