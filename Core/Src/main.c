@@ -124,6 +124,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	if (HAL_GetTick() % 1000 > 500)
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+	else
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
