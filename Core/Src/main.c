@@ -62,11 +62,27 @@ static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
+void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count)
+{
+  int16_t* S16LEInterleaved = (int16_t*)Buffer;
+  for (size_t i = 0; i < Count; i++)
+  {
+	uint16_t U16_L = (uint16_t)(S16LEInterleaved[i * 2 + 0]) + 32768;
+	S16LEInterleaved[i * 2 + 0] = 0;
+	uint32_t Volumed_L = (uint32_t)(U16_L) * Volume_Modifier / 100;
+	uint16_t U16_R = (uint16_t)(S16LEInterleaved[i * 2 + 1]) + 32768;
+	S16LEInterleaved[i * 2 + 1] = 0;
+	uint32_t Volumed_R = (uint32_t)(U16_R) * Volume_Modifier / 100;
+	Target_L[i] = (uint16_t)(Volumed_L * 1500 / 65536);
+	Target_R[i] = (uint16_t)(Volumed_R * 1500 / 65536);
+  }
+}
 /* USER CODE END 0 */
 
 /**
