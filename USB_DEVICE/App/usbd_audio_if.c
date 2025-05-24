@@ -229,6 +229,10 @@ static int8_t AUDIO_VolumeCtl_FS(uint8_t vol)
 static int8_t AUDIO_MuteCtl_FS(uint8_t cmd)
 {
   /* USER CODE BEGIN 4 */
+  if (cmd)
+	Main_SetMute();
+  else
+	Main_SetUnMute();
   return (USBD_OK);
   /* USER CODE END 4 */
 }
