@@ -64,13 +64,96 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
-
+static void SetPlayMuteBuffers();
+static void SetPlayAudioBuffers();
+void Main_SetPlayPosition(uint32_t position);
+void Main_StartPlay();
+void Main_StopPlay();
+int Main_IsPlaying();
+uint32_t Main_GetPlayPosition();
+uint32_t Main_GetEndPosition();
+uint32_t Main_GetHalfPosition();
+void Main_SetMute();
+void Main_SetUnMute();
+int Main_IsMute();
 void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+static void SetPlayMuteBuffers()
+{
+  HAL_DMA_Abort_IT(&hdma_tim2_ch1);
+  HAL_DMA_Abort(&hdma_tim2_ch2_ch4);
+  HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)&pwm_mute_buffer, (uint32_t)&TIM2->CCR1, MUTE_BUFFER_SIZE);
+  HAL_DMA_Start(&hdma_tim2_ch2_ch4, (uint32_t)&pwm_mute_buffer, (uint32_t)&TIM2->CCR2, MUTE_BUFFER_SIZE);
+}
+static void SetPlayAudioBuffers()
+{
+  HAL_DMA_Abort_IT(&hdma_tim2_ch1);
+  HAL_DMA_Abort(&hdma_tim2_ch2_ch4);
+  HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)&pwm_ch1_buffer, (uint32_t)&TIM2->CCR1, BUFFER_SIZE);
+  HAL_DMA_Start(&hdma_tim2_ch2_ch4, (uint32_t)&pwm_ch2_buffer, (uint32_t)&TIM2->CCR2, BUFFER_SIZE);
+}
+void Main_SetPlayPosition(uint32_t position)
+{
+  assert(position < BUFFER_SIZE);
+  if (is_muted) return;
+  hdma_tim2_ch1.Instance->CMAR = (uint32_t)&pwm_ch1_buffer[position];
+  hdma_tim2_ch2_ch4.Instance->CMAR = (uint32_t)&pwm_ch2_buffer[position];
+}
+void Main_StartPlay()
+{
+  if (!Main_IsPlaying()) HAL_TIM_Base_Start(&htim2);
+}
+void Main_StopPlay()
+{
+  if (Main_IsPlaying()) HAL_TIM_Base_Stop(&htim2);
+}
+int Main_IsPlaying()
+{
+  return htim2.Instance->CR1 & TIM_CR1_CEN ? 1 : 0;
+}
+uint32_t Main_GetPlayPosition()
+{
+  if (is_muted)
+    return 0;
+  else
+    return hdma_tim2_ch1.Instance->CMAR - (uint32_t)&pwm_ch1_buffer[0];
+}
+uint32_t Main_GetEndPosition()
+{
+  return BUFFER_SIZE;
+}
+uint32_t Main_GetHalfPosition()
+{
+  return BUFFER_SIZE / 2;
+}
+void Main_SetMute()
+{
+  if (pwm_mute_buffer[0] != mute_val)
+  {
+    for (size_t i = 0; i < MUTE_BUFFER_SIZE; i++)
+    {
+      pwm_mute_buffer[i] = mute_val;
+    }
+  }
+  Main_StopPlay();
+  SetPlayMuteBuffers();
+  is_muted = 1;
+  Main_StartPlay();
+}
+void Main_SetUnMute()
+{
+  Main_StopPlay();
+  SetPlayAudioBuffers();
+  is_muted = 0;
+  Main_StartPlay();
+}
+int Main_IsMute()
+{
+  return is_muted;
+}
 void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count)
 {
   int16_t* S16LEInterleaved = (int16_t*)Buffer;
