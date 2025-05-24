@@ -2247,6 +2247,12 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
           /* Get SETUP Packet */
           ep->xfer_count = PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
 
+          if (ep->xfer_count > sizeof hpcd->Setup)
+          {
+            PCD_CLEAR_RX_EP_CTR(hpcd->Instance, PCD_ENDP0);
+            return HAL_ERROR;
+          }
+
           USB_ReadPMA(hpcd->Instance, (uint8_t *)hpcd->Setup,
                       ep->pmaadress, (uint16_t)ep->xfer_count);
 
