@@ -117,7 +117,11 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-
+  memset(pwm_ch1_buffer, 0, sizeof pwm_ch1_buffer);
+  memset(pwm_ch2_buffer, 0, sizeof pwm_ch2_buffer);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1 | TIM_DMA_CC2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
