@@ -155,6 +155,7 @@ USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_FS =
 static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t options)
 {
   /* USER CODE BEGIN 0 */
+  if (AudioFreq != 48000) return USBD_FAIL;
   Volume_Modifier = Volume;
   return (USBD_OK);
   /* USER CODE END 0 */
