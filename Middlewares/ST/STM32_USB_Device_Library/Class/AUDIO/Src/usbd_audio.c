@@ -583,21 +583,19 @@ static uint8_t  USBD_AUDIO_SOF(USBD_HandleTypeDef *pdev)
   */
 void  USBD_AUDIO_Sync(USBD_HandleTypeDef *pdev, AUDIO_OffsetTypeDef offset)
 {
-  USBD_AUDIO_HandleTypeDef   *haudio;
-  haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
+  USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
+  USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
+  haudio->offset = offset;
 
-  haudio->offset =  offset;
-
-  if (haudio->offset == AUDIO_OFFSET_FULL)
+  switch (haudio->offset)
   {
-    ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->AudioCmd
-    (
-       &haudio->buffer[0],
-       AUDIO_TOTAL_BUF_SIZE,
-       AUDIO_CMD_PLAY
-	);
-    haudio->offset = AUDIO_OFFSET_NONE;
-    haudio->wr_ptr = 0;
+  case AUDIO_OFFSET_HALF:
+	  userdata->AudioCmd(0, AUDIO_CMD_PLAY);
+	break;
+  case AUDIO_OFFSET_FULL:
+  case AUDIO_OFFSET_NONE:
+	  userdata->AudioCmd(AUDIO_HALF_BUF_SIZE, AUDIO_CMD_PLAY);
+	break;
   }
 }
 
