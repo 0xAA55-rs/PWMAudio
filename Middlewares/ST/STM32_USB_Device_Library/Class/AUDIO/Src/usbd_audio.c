@@ -344,22 +344,20 @@ static uint8_t  USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
   }
   else
   {
-	USBD_AUDIO_HandleTypeDef   *haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
+	USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
+	USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
     haudio->alt_setting = 0U;
     haudio->offset = AUDIO_OFFSET_NONE;
     haudio->wr_ptr = 0U;
 
     /* Initialize the Audio output Hardware layer */
-    if (((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->Init(USBD_AUDIO_FREQ,
-                                                         AUDIO_DEFAULT_VOLUME,
-                                                         0U) != 0)
+    if (userdata->Init(USBD_AUDIO_FREQ, AUDIO_DEFAULT_VOLUME, 0U) != 0)
     {
       return USBD_FAIL;
     }
 
     /* Prepare Out endpoint to receive 1st packet */
-    USBD_LL_PrepareReceive(pdev, AUDIO_OUT_EP, haudio->buffer,
-                           AUDIO_OUT_PACKET);
+    USBD_LL_PrepareReceive(pdev, AUDIO_OUT_EP, &haudio->buffer[haudio->wr_ptr], AUDIO_OUT_PACKET);
   }
 
   return USBD_OK;
@@ -536,8 +534,7 @@ static uint8_t  USBD_AUDIO_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
   */
 static uint8_t  USBD_AUDIO_EP0_RxReady(USBD_HandleTypeDef *pdev)
 {
-  USBD_AUDIO_HandleTypeDef   *haudio;
-  haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
+  USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
 
   if (haudio->control.cmd == AUDIO_REQ_SET_CUR)
   {
@@ -545,7 +542,8 @@ static uint8_t  USBD_AUDIO_EP0_RxReady(USBD_HandleTypeDef *pdev)
 
     if (haudio->control.unit == AUDIO_OUT_STREAMING_CTRL)
     {
-      ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->MuteCtl(haudio->control.data[0]);
+      USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
+      userdata->MuteCtl(haudio->control.data[0]);
       haudio->control.cmd = 0U;
       haudio->control.len = 0U;
     }
