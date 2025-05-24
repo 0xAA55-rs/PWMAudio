@@ -2246,26 +2246,11 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
         {
           /* Get SETUP Packet */
           ep->xfer_count = PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
-          uint32_t setup_data_size = ep->xfer_count;
-          uint32_t pma_addr_offset = 0;
-          do
+
+          if (ep->xfer_count > sizeof hpcd->Setup)
           {
-            uint32_t write_to_setup = sizeof hpcd->Setup;
-            if (write_to_setup > setup_data_size) write_to_setup = setup_data_size;
-            uint32_t num_setup = write_to_setup / 4;
-            memset(hpcd->Setup, 0, sizeof hpcd->Setup);
-            USB_ReadPMA(hpcd->Instance, (uint8_t *)hpcd->Setup,
-                         ep->pmaadress + pma_addr_offset, (uint16_t)write_to_setup);
-            pma_addr_offset += write_to_setup;
-            setup_data_size -= write_to_setup;
-            while (num_setup >= 2)
-            {
-              for (uint32_t i = 0; i < num_setup; i += 2)
-              {
-                USBD_LL_SetupStage(hpcd, (uint8_t*)&hpcd->Setup[i]);
-              }
-            }
-          } while (setup_data_size);
+            return HAL_ERROR;
+          }
 
           /* SETUP bit kept frozen while CTR_RX = 1 */
           PCD_CLEAR_RX_EP_CTR(hpcd->Instance, PCD_ENDP0);
