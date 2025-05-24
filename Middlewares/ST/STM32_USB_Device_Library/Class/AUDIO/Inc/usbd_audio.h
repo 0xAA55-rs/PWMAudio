@@ -115,7 +115,6 @@ typedef enum
   AUDIO_OFFSET_NONE = 0,
   AUDIO_OFFSET_HALF,
   AUDIO_OFFSET_FULL,
-  AUDIO_OFFSET_UNKNOWN,
 }
 AUDIO_OffsetTypeDef;
 /**
@@ -142,9 +141,7 @@ typedef struct
   uint32_t                  alt_setting;
   uint8_t                   buffer[AUDIO_TOTAL_BUF_SIZE];
   AUDIO_OffsetTypeDef       offset;
-  uint8_t                    rd_enable;
-  uint16_t                   rd_ptr;
-  uint16_t                   wr_ptr;
+  uint16_t                  wr_ptr;
   USBD_AUDIO_ControlTypeDef control;
 }
 USBD_AUDIO_HandleTypeDef;

@@ -346,10 +346,8 @@ static uint8_t  USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
   {
 	USBD_AUDIO_HandleTypeDef   *haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
     haudio->alt_setting = 0U;
-    haudio->offset = AUDIO_OFFSET_UNKNOWN;
+    haudio->offset = AUDIO_OFFSET_NONE;
     haudio->wr_ptr = 0U;
-    haudio->rd_ptr = 0U;
-    haudio->rd_enable = 0U;
 
     /* Initialize the Audio output Hardware layer */
     if (((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->Init(USBD_AUDIO_FREQ,
@@ -585,58 +583,21 @@ static uint8_t  USBD_AUDIO_SOF(USBD_HandleTypeDef *pdev)
   */
 void  USBD_AUDIO_Sync(USBD_HandleTypeDef *pdev, AUDIO_OffsetTypeDef offset)
 {
-  uint32_t cmd = 0U;
   USBD_AUDIO_HandleTypeDef   *haudio;
   haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
 
   haudio->offset =  offset;
 
-  if (haudio->rd_enable == 1U)
-  {
-    haudio->rd_ptr += (uint16_t)(AUDIO_TOTAL_BUF_SIZE / 2U);
-
-    if (haudio->rd_ptr == AUDIO_TOTAL_BUF_SIZE)
-    {
-      /* roll back */
-      haudio->rd_ptr = 0U;
-    }
-  }
-
-  if (haudio->rd_ptr > haudio->wr_ptr)
-  {
-    if ((haudio->rd_ptr - haudio->wr_ptr) < AUDIO_OUT_PACKET)
-    {
-      cmd = AUDIO_TOTAL_BUF_SIZE / 2U + 4U;
-    }
-    else
-    {
-      if ((haudio->rd_ptr - haudio->wr_ptr) > (AUDIO_TOTAL_BUF_SIZE - AUDIO_OUT_PACKET))
-      {
-        cmd = AUDIO_TOTAL_BUF_SIZE / 2U - 4U;
-      }
-    }
-  }
-  else
-  {
-    if ((haudio->wr_ptr - haudio->rd_ptr) < AUDIO_OUT_PACKET)
-    {
-      cmd = AUDIO_TOTAL_BUF_SIZE / 2U - 4U;
-    }
-    else
-    {
-      if ((haudio->wr_ptr - haudio->rd_ptr) > (AUDIO_TOTAL_BUF_SIZE - AUDIO_OUT_PACKET))
-      {
-        cmd = AUDIO_TOTAL_BUF_SIZE / 2U + 4U;
-      }
-    }
-  }
-
   if (haudio->offset == AUDIO_OFFSET_FULL)
   {
-    ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->AudioCmd(&haudio->buffer[0],
-                                                         cmd,
-                                                         AUDIO_CMD_PLAY);
+    ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->AudioCmd
+    (
+       &haudio->buffer[0],
+       AUDIO_TOTAL_BUF_SIZE,
+       AUDIO_CMD_PLAY
+	);
     haudio->offset = AUDIO_OFFSET_NONE;
+    haudio->wr_ptr = 0;
   }
 }
 
@@ -677,34 +638,22 @@ static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
   if (epnum == AUDIO_OUT_EP)
   {
     /* Increment the Buffer pointer or roll it back when all buffers are full */
-
     haudio->wr_ptr += AUDIO_OUT_PACKET;
 
     if (haudio->wr_ptr == AUDIO_TOTAL_BUF_SIZE)
     {
-      /* All buffers are full: roll back */
+      ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->AudioCmd
+      (
+        &haudio->buffer[0],
+        AUDIO_TOTAL_BUF_SIZE,
+        AUDIO_CMD_START
+	  );
+      haudio->offset = AUDIO_OFFSET_NONE;
       haudio->wr_ptr = 0U;
-
-      if (haudio->offset == AUDIO_OFFSET_UNKNOWN)
-      {
-        ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->AudioCmd(&haudio->buffer[0],
-                                                             AUDIO_TOTAL_BUF_SIZE / 2U,
-                                                             AUDIO_CMD_START);
-        haudio->offset = AUDIO_OFFSET_NONE;
-      }
-    }
-
-    if (haudio->rd_enable == 0U)
-    {
-      if (haudio->wr_ptr == (AUDIO_TOTAL_BUF_SIZE / 2U))
-      {
-        haudio->rd_enable = 1U;
-      }
     }
 
     /* Prepare Out endpoint to receive next audio packet */
-    USBD_LL_PrepareReceive(pdev, AUDIO_OUT_EP, &haudio->buffer[haudio->wr_ptr],
-                           AUDIO_OUT_PACKET);
+    USBD_LL_PrepareReceive(pdev, AUDIO_OUT_EP, &haudio->buffer[haudio->wr_ptr], AUDIO_OUT_PACKET);
   }
 
   return USBD_OK;
