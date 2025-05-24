@@ -48,7 +48,7 @@
   */
 
 /* USER CODE BEGIN EXPORTED_DEFINES */
-
+#define BUFFER_SIZE (AUDIO_TOTAL_BUF_SIZE / 4)
 /* USER CODE END EXPORTED_DEFINES */
 
 /**
@@ -90,7 +90,10 @@
 extern USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_FS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
-
+extern uint16_t pwm_ch1_buffer[BUFFER_SIZE];
+extern uint16_t pwm_ch2_buffer[BUFFER_SIZE];
+extern uint16_t* pwm_ch1_buffer_half;
+extern uint16_t* pwm_ch2_buffer_half;
 /* USER CODE END EXPORTED_VARIABLES */
 
 /**
