@@ -125,8 +125,7 @@ static int8_t AUDIO_PeriodicTC_FS(uint8_t cmd);
 static int8_t AUDIO_GetState_FS(void);
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-uint32_t BufPtrToPlayPosition(uint8_t *BufPtr);
-size_t BufSizeToSampleCount(uint32_t BufSize);
+
 /* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
@@ -289,14 +288,7 @@ void HalfTransfer_CallBack_FS(void)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
-uint32_t BufPtrToPlayPosition(uint8_t *BufPtr)
-{
-  return (uint32_t)(BufPtr - haudio.buffer) / 2;
-}
-size_t BufSizeToSampleCount(uint32_t BufSize)
-{
-  return BufSize;
-}
+
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**
