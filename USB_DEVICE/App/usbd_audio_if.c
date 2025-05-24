@@ -270,7 +270,7 @@ static int8_t AUDIO_GetState_FS(void)
 void TransferComplete_CallBack_FS(void)
 {
   /* USER CODE BEGIN 7 */
-  USBD_AUDIO_Sync(&hUsbDeviceFS, AUDIO_OFFSET_FULL);
+  assert(0);
   /* USER CODE END 7 */
 }
 
@@ -281,7 +281,7 @@ void TransferComplete_CallBack_FS(void)
 void HalfTransfer_CallBack_FS(void)
 {
   /* USER CODE BEGIN 8 */
-  USBD_AUDIO_Sync(&hUsbDeviceFS, AUDIO_OFFSET_HALF);
+  assert(0);
   /* USER CODE END 8 */
 }
 
