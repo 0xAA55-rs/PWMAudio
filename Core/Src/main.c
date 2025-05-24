@@ -64,8 +64,8 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
-static void SetPlayMuteBuffers();
-static void SetPlayAudioBuffers();
+void Main_SetPlayMuteBuffers();
+void Main_SetPlayAudioBuffers();
 void Main_SetPlayPosition(uint32_t position);
 void Main_StartPlay();
 void Main_StopPlay();
@@ -81,14 +81,14 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static void SetPlayMuteBuffers()
+void Main_SetPlayMuteBuffers()
 {
   HAL_DMA_Abort_IT(&hdma_tim2_ch1);
   HAL_DMA_Abort(&hdma_tim2_ch2_ch4);
   HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)&pwm_mute_buffer, (uint32_t)&TIM2->CCR1, MUTE_BUFFER_SIZE);
   HAL_DMA_Start(&hdma_tim2_ch2_ch4, (uint32_t)&pwm_mute_buffer, (uint32_t)&TIM2->CCR2, MUTE_BUFFER_SIZE);
 }
-static void SetPlayAudioBuffers()
+void Main_SetPlayAudioBuffers()
 {
   HAL_DMA_Abort_IT(&hdma_tim2_ch1);
   HAL_DMA_Abort(&hdma_tim2_ch2_ch4);
@@ -139,14 +139,14 @@ void Main_SetMute()
     }
   }
   Main_StopPlay();
-  SetPlayMuteBuffers();
+  Main_SetPlayMuteBuffers();
   is_muted = 1;
   Main_StartPlay();
 }
 void Main_SetUnMute()
 {
   Main_StopPlay();
-  SetPlayAudioBuffers();
+  Main_SetPlayAudioBuffers();
   is_muted = 0;
   Main_StartPlay();
 }

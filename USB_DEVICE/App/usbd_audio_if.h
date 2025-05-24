@@ -120,6 +120,8 @@ void TransferComplete_CallBack_FS(void);
 void HalfTransfer_CallBack_FS(void);
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
+extern void Main_SetPlayMuteBuffers();
+extern void Main_SetPlayAudioBuffers();
 extern void Main_SetPlayPosition(uint32_t position);
 extern void Main_StartPlay();
 extern void Main_StopPlay();
