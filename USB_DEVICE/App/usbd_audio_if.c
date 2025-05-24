@@ -156,6 +156,7 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
 {
   /* USER CODE BEGIN 0 */
   if (AudioFreq != 48000) return USBD_FAIL;
+  memset(&haudio.buffer, 0, sizeof haudio.buffer);
   Volume_Modifier = Volume;
   return (USBD_OK);
   /* USER CODE END 0 */
