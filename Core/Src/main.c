@@ -169,6 +169,28 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
 	Target_R[i] = (uint16_t)(Volumed_R * 1500 / 65536);
   }
 }
+void OnHalf(DMA_HandleTypeDef *hdma)
+{
+	if (is_muted) return;
+	ConvertS16LEStereoToPWM
+	(
+		haudio.buffer,
+		pwm_ch1_buffer_half,
+		pwm_ch2_buffer_half,
+		BUFFER_SIZE / 2
+	);
+}
+void OnCplt(DMA_HandleTypeDef *hdma)
+{
+	if (is_muted) return;
+	ConvertS16LEStereoToPWM
+	(
+		haudio.buffer,
+		pwm_ch1_buffer,
+		pwm_ch2_buffer,
+		BUFFER_SIZE / 2
+	);
+}
 /* USER CODE END 0 */
 
 /**
@@ -205,6 +227,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   memset(pwm_ch1_buffer, 0, sizeof pwm_ch1_buffer);
   memset(pwm_ch2_buffer, 0, sizeof pwm_ch2_buffer);
+  HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_CPLT_CB_ID, OnCplt);
+  HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_HALFCPLT_CB_ID, OnHalf);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1 | TIM_DMA_CC2);
