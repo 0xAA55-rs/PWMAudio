@@ -321,7 +321,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIE
 /** @defgroup USBD_AUDIO_Private_Functions
   * @{
   */
-
+extern USBD_AUDIO_HandleTypeDef haudio;
 /**
   * @brief  USBD_AUDIO_Init
   *         Initialize the AUDIO interface
@@ -331,14 +331,12 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIE
   */
 static uint8_t  USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 {
-  USBD_AUDIO_HandleTypeDef   *haudio;
-
   /* Open EP OUT */
   USBD_LL_OpenEP(pdev, AUDIO_OUT_EP, USBD_EP_TYPE_ISOC, AUDIO_OUT_PACKET);
   pdev->ep_out[AUDIO_OUT_EP & 0xFU].is_used = 1U;
 
   /* Allocate Audio structure */
-  pdev->pClassData = USBD_malloc(sizeof(USBD_AUDIO_HandleTypeDef));
+  pdev->pClassData = &haudio;
 
   if (pdev->pClassData == NULL)
   {
@@ -346,7 +344,7 @@ static uint8_t  USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
   }
   else
   {
-    haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
+	USBD_AUDIO_HandleTypeDef   *haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
     haudio->alt_setting = 0U;
     haudio->offset = AUDIO_OFFSET_UNKNOWN;
     haudio->wr_ptr = 0U;
@@ -387,7 +385,6 @@ static uint8_t  USBD_AUDIO_DeInit(USBD_HandleTypeDef *pdev,
   if (pdev->pClassData != NULL)
   {
     ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->DeInit(0U);
-    USBD_free(pdev->pClassData);
     pdev->pClassData = NULL;
   }
 
