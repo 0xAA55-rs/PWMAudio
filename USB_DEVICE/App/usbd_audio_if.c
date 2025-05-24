@@ -103,6 +103,7 @@
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
+extern uint32_t Volume_Modifier;
 
 /* USER CODE END EXPORTED_VARIABLES */
 
@@ -153,6 +154,7 @@ USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_FS =
 static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t options)
 {
   /* USER CODE BEGIN 0 */
+  Volume_Modifier = Volume;
   return (USBD_OK);
   /* USER CODE END 0 */
 }
@@ -199,6 +201,7 @@ static int8_t AUDIO_AudioCmd_FS(uint8_t* pbuf, uint32_t size, uint8_t cmd)
 static int8_t AUDIO_VolumeCtl_FS(uint8_t vol)
 {
   /* USER CODE BEGIN 3 */
+  Volume_Modifier = vol;
   return (USBD_OK);
   /* USER CODE END 3 */
 }
