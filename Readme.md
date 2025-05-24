@@ -1,5 +1,9 @@
 # STM32F103C8T6/CBT6 Sound Card
 
+## Language 语言
+
+English | [简体中文](Readme-CN.md)
+
 ## Overview
 
 * Code was generated with STM32CubeMX and modified by the author.
