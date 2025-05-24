@@ -52,6 +52,7 @@ uint16_t pwm_ch1_buffer[BUFFER_SIZE];
 uint16_t pwm_ch2_buffer[BUFFER_SIZE];
 uint16_t* pwm_ch1_buffer_half = &pwm_ch1_buffer[BUFFER_SIZE / 2];
 uint16_t* pwm_ch2_buffer_half = &pwm_ch2_buffer[BUFFER_SIZE / 2];
+uint32_t Volume_Modifier = 100;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
