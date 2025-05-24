@@ -49,6 +49,7 @@
 
 /* USER CODE BEGIN EXPORTED_DEFINES */
 #define BUFFER_SIZE (AUDIO_TOTAL_BUF_SIZE / 4)
+#define MUTE_BUFFER_SIZE 128
 /* USER CODE END EXPORTED_DEFINES */
 
 /**
@@ -94,6 +95,7 @@ extern uint16_t pwm_ch1_buffer[BUFFER_SIZE];
 extern uint16_t pwm_ch2_buffer[BUFFER_SIZE];
 extern uint16_t* pwm_ch1_buffer_half;
 extern uint16_t* pwm_ch2_buffer_half;
+extern USBD_AUDIO_HandleTypeDef haudio;
 /* USER CODE END EXPORTED_VARIABLES */
 
 /**
@@ -118,7 +120,17 @@ void TransferComplete_CallBack_FS(void);
 void HalfTransfer_CallBack_FS(void);
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
-
+extern void Main_SetPlayPosition(uint32_t position);
+extern void Main_StartPlay();
+extern void Main_StopPlay();
+extern int Main_IsPlaying();
+extern uint32_t Main_GetPlayPosition();
+extern uint32_t Main_GetEndPosition();
+extern uint32_t Main_GetHalfPosition();
+extern void Main_SetMute();
+extern void Main_SetUnMute();
+extern int Main_IsMute();
+extern void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count);
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**
