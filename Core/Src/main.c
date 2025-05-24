@@ -175,8 +175,8 @@ void OnHalf(DMA_HandleTypeDef *hdma)
 	ConvertS16LEStereoToPWM
 	(
 		haudio.buffer,
-		pwm_ch1_buffer_half,
-		pwm_ch2_buffer_half,
+		pwm_ch1_buffer,
+		pwm_ch2_buffer,
 		BUFFER_SIZE / 2
 	);
 }
@@ -186,8 +186,8 @@ void OnCplt(DMA_HandleTypeDef *hdma)
 	ConvertS16LEStereoToPWM
 	(
 		haudio.buffer,
-		pwm_ch1_buffer,
-		pwm_ch2_buffer,
+		pwm_ch1_buffer_half,
+		pwm_ch2_buffer_half,
 		BUFFER_SIZE / 2
 	);
 }
