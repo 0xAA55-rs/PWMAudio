@@ -142,6 +142,7 @@ typedef struct
 {
   uint32_t                  alt_setting;
   uint8_t                   buffer[AUDIO_TOTAL_BUF_SIZE];
+  int                       started;
   AUDIO_OffsetTypeDef       offset;
   uint16_t                  wr_ptr;
   USBD_AUDIO_ControlTypeDef control;

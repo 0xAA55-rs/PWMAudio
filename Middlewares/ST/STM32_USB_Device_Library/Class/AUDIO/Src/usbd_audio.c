@@ -632,22 +632,27 @@ static uint8_t  USBD_AUDIO_IsoOutIncomplete(USBD_HandleTypeDef *pdev, uint8_t ep
   */
 static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
-  USBD_AUDIO_HandleTypeDef   *haudio;
-  haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
+  USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
+  USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
 
   if (epnum == AUDIO_OUT_EP)
   {
-    /* Increment the Buffer pointer or roll it back when all buffers are full */
     haudio->wr_ptr += AUDIO_OUT_PACKET;
-
-    if (haudio->wr_ptr == AUDIO_TOTAL_BUF_SIZE)
+    if (haudio->wr_ptr == AUDIO_HALF_BUF_SIZE)
     {
-      ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->AudioCmd
-      (
-        &haudio->buffer[0],
-        AUDIO_TOTAL_BUF_SIZE,
-        AUDIO_CMD_START
-	  );
+      USBD_AUDIO_Sync(pdev, AUDIO_OFFSET_HALF);
+    }
+    else if (haudio->wr_ptr == AUDIO_TOTAL_BUF_SIZE)
+    {
+      if (!haudio->started)
+      {
+        userdata->AudioCmd(0, AUDIO_CMD_START);
+        haudio->started = 1;
+      }
+      else
+      {
+        USBD_AUDIO_Sync(pdev, AUDIO_OFFSET_FULL);
+      }
       haudio->offset = AUDIO_OFFSET_NONE;
       haudio->wr_ptr = 0U;
     }
