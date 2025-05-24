@@ -104,7 +104,7 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
 extern uint32_t Volume_Modifier;
-
+int is_first_play = 1;
 /* USER CODE END EXPORTED_VARIABLES */
 
 /**
@@ -187,9 +187,20 @@ static int8_t AUDIO_AudioCmd_FS(uint8_t* pbuf, uint32_t size, uint8_t cmd)
   switch(cmd)
   {
     case AUDIO_CMD_START:
+      if (is_first_play)
+      {
+          is_first_play = 0;
+          ConvertS16LEStereoToPWM(pbuf, pwm_ch1_buffer, pwm_ch2_buffer, BUFFER_SIZE);
+          if (Main_IsMute()) Main_SetUnMute();
+          Main_SetPlayPosition(0);
+          Main_StartPlay();
+      }
+      if (Main_IsMute()) Main_SetUnMute();
     break;
 
     case AUDIO_CMD_PLAY:
+      if (Main_IsMute()) Main_SetUnMute();
+      Main_StartPlay();
     break;
   }
   return (USBD_OK);
