@@ -159,14 +159,14 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
   int16_t* S16LEInterleaved = (int16_t*)Buffer;
   for (size_t i = 0; i < Count; i++)
   {
-	uint16_t U16_L = (uint16_t)(S16LEInterleaved[i * 2 + 0]) + 32768;
-	uint32_t Volumed_L = (uint32_t)(U16_L) * Volume_Modifier / 100;
-	uint16_t U16_R = (uint16_t)(S16LEInterleaved[i * 2 + 1]) + 32768;
-	uint32_t Volumed_R = (uint32_t)(U16_R) * Volume_Modifier / 100;
-	Target_L[i] = (uint16_t)(Volumed_L * 1500 / 65536);
-	Target_R[i] = (uint16_t)(Volumed_R * 1500 / 65536);
-	S16LEInterleaved[i * 2 + 0] = 0;
-	S16LEInterleaved[i * 2 + 1] = 0;
+  uint16_t U16_L = (uint16_t)(S16LEInterleaved[i * 2 + 0]) + 32768;
+  uint32_t Volumed_L = (uint32_t)(U16_L) * Volume_Modifier / 100;
+  uint16_t U16_R = (uint16_t)(S16LEInterleaved[i * 2 + 1]) + 32768;
+  uint32_t Volumed_R = (uint32_t)(U16_R) * Volume_Modifier / 100;
+  Target_L[i] = (uint16_t)(Volumed_L * 1500 / 65536);
+  Target_R[i] = (uint16_t)(Volumed_R * 1500 / 65536);
+  S16LEInterleaved[i * 2 + 0] = 0;
+  S16LEInterleaved[i * 2 + 1] = 0;
   }
 }
 void OnHalf(DMA_HandleTypeDef *hdma)
@@ -239,10 +239,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	if (HAL_GetTick() % 1000 > 500)
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-	else
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+  if (HAL_GetTick() % 1000 > 500)
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+  else
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
