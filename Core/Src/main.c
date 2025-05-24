@@ -171,25 +171,25 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
 }
 void OnHalf(DMA_HandleTypeDef *hdma)
 {
-	if (is_muted) return;
-	ConvertS16LEStereoToPWM
-	(
-		haudio.buffer,
-		pwm_ch1_buffer,
-		pwm_ch2_buffer,
-		BUFFER_SIZE / 2
-	);
+  if (is_muted) return;
+  ConvertS16LEStereoToPWM
+  (
+    &haudio.buffer[0],
+    pwm_ch1_buffer,
+    pwm_ch2_buffer,
+    BUFFER_SIZE / 2
+  );
 }
 void OnCplt(DMA_HandleTypeDef *hdma)
 {
-	if (is_muted) return;
-	ConvertS16LEStereoToPWM
-	(
-		haudio.buffer,
-		pwm_ch1_buffer_half,
-		pwm_ch2_buffer_half,
-		BUFFER_SIZE / 2
-	);
+  if (is_muted) return;
+  ConvertS16LEStereoToPWM
+  (
+    &haudio.buffer[AUDIO_HALF_BUF_SIZE],
+    pwm_ch1_buffer_half,
+    pwm_ch2_buffer_half,
+    BUFFER_SIZE / 2
+  );
 }
 /* USER CODE END 0 */
 
