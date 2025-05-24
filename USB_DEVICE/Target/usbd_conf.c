@@ -578,38 +578,6 @@ void USBD_LL_Delay(uint32_t Delay)
 }
 
 /**
-  * @brief  Static single allocation.
-  * @param  size: Size of allocated memory
-  * @retval None
-  */
-void *USBD_static_malloc(uint32_t size)
-{
-  /* static uint8_t mem[sizeof(USBD_AUDIO_HandleTypeDef)]; */
-  /* USER CODE BEGIN 4 */
-  /**
-  * To compute the request size you must use the formula:
-    AUDIO_OUT_PACKET = (USBD_AUDIO_FREQ * 2 * 2) /1000)
-    AUDIO_TOTAL_BUF_SIZE = AUDIO_OUT_PACKET * AUDIO_OUT_PACKET_NUM with
-	Number of sub-packets in the audio transfer buffer. You can modify this value but always make sure
-    that it is an even number and higher than 3
-	AUDIO_OUT_PACKET_NUM = 80
-  */
-  static uint8_t mem[512];
-  /* USER CODE END 4 */
-  return mem;
-}
-
-/**
-  * @brief  Dummy memory free
-  * @param  p: Pointer to allocated  memory address
-  * @retval None
-  */
-void USBD_static_free(void *p)
-{
-
-}
-
-/**
   * @brief Software Device Connection
   * @param hpcd: PCD handle
   * @param state: Connection state (0: disconnected / 1: connected)
