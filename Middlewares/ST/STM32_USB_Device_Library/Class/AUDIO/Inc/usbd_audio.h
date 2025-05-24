@@ -97,9 +97,11 @@ extern "C" {
 
 /* Number of sub-packets in the audio transfer buffer. You can modify this value but always make sure
   that it is an even number and higher than 3 */
-#define AUDIO_OUT_PACKET_NUM                          20U
+#define AUDIO_OUT_PACKET_NUM                          10U
 /* Total size of the audio transfer buffer */
 #define AUDIO_TOTAL_BUF_SIZE                          ((uint16_t)(AUDIO_OUT_PACKET * AUDIO_OUT_PACKET_NUM))
+
+#define AUDIO_HALF_BUF_SIZE                           (AUDIO_TOTAL_BUF_SIZE / 2)
 
 /* Audio Commands enumeration */
 typedef enum
