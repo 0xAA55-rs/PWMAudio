@@ -201,12 +201,10 @@ static int8_t AUDIO_AudioCmd_FS(uint8_t* pbuf, uint32_t size, uint8_t cmd)
 
     case AUDIO_CMD_PLAY:
       if (Main_IsMute()) Main_SetUnMute();
-      Main_StartPlay();
     break;
 
     case AUDIO_CMD_STOP:
-      Main_StopPlay();
-      is_first_play = 1;
+      if (!Main_IsMute()) Main_SetMute();
     break;
   }
   return (USBD_OK);
