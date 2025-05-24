@@ -52,6 +52,9 @@ uint16_t pwm_ch1_buffer[BUFFER_SIZE];
 uint16_t pwm_ch2_buffer[BUFFER_SIZE];
 uint16_t* pwm_ch1_buffer_half = &pwm_ch1_buffer[BUFFER_SIZE / 2];
 uint16_t* pwm_ch2_buffer_half = &pwm_ch2_buffer[BUFFER_SIZE / 2];
+uint16_t pwm_mute_buffer[MUTE_BUFFER_SIZE];
+const uint16_t mute_val = 750;
+int is_muted = 0;
 uint32_t Volume_Modifier = 100;
 /* USER CODE END PV */
 
