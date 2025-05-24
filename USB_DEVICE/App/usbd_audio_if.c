@@ -118,7 +118,7 @@ int is_first_play = 1;
 
 static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t options);
 static int8_t AUDIO_DeInit_FS(uint32_t options);
-static int8_t AUDIO_AudioCmd_FS(uint8_t* pbuf, uint32_t size, uint8_t cmd);
+static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd);
 static int8_t AUDIO_VolumeCtl_FS(uint8_t vol);
 static int8_t AUDIO_MuteCtl_FS(uint8_t cmd);
 static int8_t AUDIO_PeriodicTC_FS(uint8_t cmd);
@@ -182,7 +182,7 @@ static int8_t AUDIO_DeInit_FS(uint32_t options)
   * @param  cmd: Command opcode
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_AudioCmd_FS(uint8_t* pbuf, uint32_t size, uint8_t cmd)
+static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
 {
   /* USER CODE BEGIN 2 */
   switch(cmd)
