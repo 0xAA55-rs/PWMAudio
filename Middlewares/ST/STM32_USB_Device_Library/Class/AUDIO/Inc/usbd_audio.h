@@ -103,6 +103,8 @@ extern "C" {
 
 #define AUDIO_HALF_BUF_SIZE                           (AUDIO_TOTAL_BUF_SIZE / 2)
 
+#define AUDIO_BUF_SAMPLE_COUNT                        (AUDIO_TOTAL_BUF_SIZE / 2)
+
 /* Audio Commands enumeration */
 typedef enum
 {
