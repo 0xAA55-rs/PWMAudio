@@ -671,13 +671,28 @@ static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
   */
 static void AUDIO_REQ_GetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
-  USBD_AUDIO_HandleTypeDef   *haudio;
-  haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
+  USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
+  USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
 
   memset(haudio->control.data, 0, 64U);
 
-  /* Send the current mute state */
-  USBD_CtlSendData(pdev, haudio->control.data, req->wLength);
+  uint8_t command = HIBYTE(req->wValue);
+  uint8_t channel = LOBYTE(req->wValue);
+  uint8_t data = 0;
+
+  switch (command)
+  {
+  case AUDIO_CONTROL_MUTE:
+    userdata->MuteGet(channel, &data);
+    USBD_CtlSendData(pdev, &data, 1);
+    break;
+  case AUDIO_CONTROL_VOLUME:
+    userdata->VolumeGet(channel, &data);
+    USBD_CtlSendData(pdev, &data, 1);
+    break;
+  default:
+	assert(0);
+  }
 }
 
 /**
