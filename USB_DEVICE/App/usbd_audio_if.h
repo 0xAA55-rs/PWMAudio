@@ -96,42 +96,17 @@ extern uint16_t pwm_ch2_buffer[BUFFER_SIZE];
 extern uint16_t* pwm_ch1_buffer_half;
 extern uint16_t* pwm_ch2_buffer_half;
 extern USBD_AUDIO_HandleTypeDef haudio;
+extern uint32_t volume_l;
+extern uint32_t volume_r;
+extern int is_muted_l;
+extern int is_muted_r;
 /* USER CODE END EXPORTED_VARIABLES */
 
-/**
-  * @}
-  */
-
-/** @defgroup USBD_AUDIO_IF_Exported_FunctionsPrototype USBD_AUDIO_IF_Exported_FunctionsPrototype
-  * @brief Public functions declaration.
-  * @{
-  */
-
-/**
-  * @brief  Manages the DMA full transfer complete event.
-  * @retval None
-  */
-void TransferComplete_CallBack_FS(void);
-
-/**
-  * @brief  Manages the DMA half transfer complete event.
-  * @retval None
-  */
-void HalfTransfer_CallBack_FS(void);
-
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
-extern void Main_SetPlayMuteBuffers();
 extern void Main_SetPlayAudioBuffers();
-extern void Main_SetPlayPosition(uint32_t position);
-extern void Main_StartPlay();
-extern void Main_StopPlay();
-extern int Main_IsPlaying();
-extern uint32_t Main_GetPlayPosition();
-extern uint32_t Main_GetEndPosition();
-extern uint32_t Main_GetHalfPosition();
-extern void Main_SetMute();
-extern void Main_SetUnMute();
-extern int Main_IsMute();
+extern void Main_StartPlayTimer();
+extern void Main_StopPlayTimer();
+extern int Main_IsPlayTimerOn();
 extern void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count);
 /* USER CODE END EXPORTED_FUNCTIONS */
 
