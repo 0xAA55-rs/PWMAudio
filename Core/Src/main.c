@@ -64,19 +64,7 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
-void Main_SetPlayMuteBuffers();
-void Main_SetPlayAudioBuffers();
-void Main_SetPlayPosition(uint32_t position);
-void Main_StartPlay();
-void Main_StopPlay();
-int Main_IsPlaying();
-uint32_t Main_GetPlayPosition();
-uint32_t Main_GetEndPosition();
-uint32_t Main_GetHalfPosition();
-void Main_SetMute();
-void Main_SetUnMute();
-int Main_IsMute();
-void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
