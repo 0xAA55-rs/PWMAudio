@@ -76,21 +76,17 @@ void Main_SetPlayAudioBuffers()
   HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)&pwm_ch1_buffer, (uint32_t)&TIM2->CCR1, BUFFER_SIZE);
   HAL_DMA_Start(&hdma_tim2_ch2_ch4, (uint32_t)&pwm_ch2_buffer, (uint32_t)&TIM2->CCR2, BUFFER_SIZE);
 }
-void Main_StartPlay()
-{
-  if (!Main_IsPlaying()) HAL_TIM_Base_Start(&htim2);
-}
-void Main_StopPlay()
-{
-  if (Main_IsPlaying()) HAL_TIM_Base_Stop(&htim2);
-}
-int Main_IsPlaying()
+int Main_IsPlayTimerOn()
 {
   return htim2.Instance->CR1 & TIM_CR1_CEN ? 1 : 0;
 }
+void Main_StartPlayTimer()
 {
+  if (!Main_IsPlayTimerOn()) HAL_TIM_Base_Start(&htim2);
 }
+void Main_StopPlayTimer()
 {
+  if (Main_IsPlayTimerOn()) HAL_TIM_Base_Stop(&htim2);
 }
 void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count)
 {
@@ -170,6 +166,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1 | TIM_DMA_CC2);
+  Main_StartPlayTimer();
   /* USER CODE END 2 */
 
   /* Infinite loop */
