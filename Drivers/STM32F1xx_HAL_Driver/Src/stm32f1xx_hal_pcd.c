@@ -2273,6 +2273,11 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 			xfer_count
           );
 
+          if (ep->xfer_count > sizeof hpcd->Setup)
+          {
+            uint32_t header = hpcd->Setup[0];
+          }
+
           /* Process SETUP Packet*/
 #if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
           hpcd->SetupStageCallback(hpcd);
