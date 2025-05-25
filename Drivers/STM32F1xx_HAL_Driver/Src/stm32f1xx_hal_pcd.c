@@ -2244,25 +2244,69 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
         if ((wEPVal & USB_EP_SETUP) != 0U)
         {
+          // Setup handling here. The Setup data from the host is located in the PMA area of EP0.
+          // Each Setup packet consists of an 8-byte header followed by optional data.
+          // First, read the header. Note that the header fields are stored in big-endian format and need to be converted to little-endian.
+          // Then check the `wLength` field in the header to determine if there's additional data.
+          // If data exists, read it as well.
+          // After reading all contents and storing them in `hpcd->Setup`, pass control to `HAL_PCD_SetupStageCallback()` for processing.
+          // Continue the loop until all Setup requests are processed.
+          typedef struct _
+          {
+            uint8_t   bmRequest;
+            uint8_t   bRequest;
+            uint16_t  wValue;
+            uint16_t  wIndex;
+            uint16_t  wLength;
+          } USBD_SetupReqTypedef;
+
           /* Get SETUP Packet */
           ep->xfer_count = PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
-          uint32_t setup_xfers = ep->xfer_count;
-          uint32_t pmaaddr_offset = 0;
+          size_t setup_xfers = ep->xfer_count;
+          size_t pmaaddr_offset = 0;
 
-          // 它的每次使用的 Setup 的数据是 8 个字节，因此每 8 字节进行一次 Setup。
-          // 这样做了以后，好像某些播放器还是不能切歌，但是重新插拔 USB 却能使声卡恢复工作状态了。
-          //
-          // TODO
-          // 哦我现在知道怎么做了。用 `USBD_ParseSetupRequest()`分析数据，可以得到一个 `USBD_SetupReqTypedef`
-          // 而这个 `USBD_SetupReqTypedef` 的后面是有数据的。
-          // 把 `USBD_SetupReqTypedef` 和它的数据一起丢给 `HAL_PCD_SetupStageCallback()` 来处理，直到全部处理完。
-          // 估计类似音量控制等信号也就能接收进来了。
           while (setup_xfers >= 8)
           {
-            USB_ReadPMA(hpcd->Instance, (uint8_t *)hpcd->Setup,
-                        ep->pmaadress + pmaaddr_offset, 8);
+            extern void* memset(void *, int, size_t);
+            memset(hpcd->Setup, 0, sizeof hpcd->Setup);
+            USB_ReadPMA
+			(
+			  hpcd->Instance,
+              (uint8_t *)hpcd->Setup,
+              ep->pmaadress + pmaaddr_offset,
+			  8
+			);
             pmaaddr_offset += 8;
             setup_xfers -= 8;
+            size_t space_for_payload = sizeof hpcd->Setup - 8;
+            uint8_t* ptr = (uint8_t *)hpcd->Setup;
+            USBD_SetupReqTypedef req =
+            {
+              ptr[0], // bmRequest
+              ptr[1], // bRequest
+              ((uint16_t)(ptr[2]) << 8) | (uint16_t)(ptr[3]), // wValue
+              ((uint16_t)(ptr[4]) << 8) | (uint16_t)(ptr[5]), // wIndex
+              ((uint16_t)(ptr[6]) << 8) | (uint16_t)(ptr[7]), // wLength
+            };
+            if (req.wLength <= space_for_payload)
+            {
+              USB_ReadPMA
+              (
+                hpcd->Instance,
+                (uint8_t *)hpcd->Setup + 8,
+                ep->pmaadress + pmaaddr_offset,
+				req.wLength
+              );
+              pmaaddr_offset += req.wLength;
+              setup_xfers -= req.wLength;
+            }
+            else
+            {
+              // The payload is too long, there's no way to handle it. Skip this packet.
+              pmaaddr_offset += req.wLength;
+              setup_xfers -= req.wLength;
+              continue;
+            }
 
             /* Process SETUP Packet*/
 #if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
