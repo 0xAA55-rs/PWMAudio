@@ -211,9 +211,10 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[USB_AUDIO_CONFIG_DESC_SIZ] __ALI
   AUDIO_CONTROL_FEATURE_UNIT,           /* bDescriptorSubtype */
   AUDIO_OUT_STREAMING_CTRL,             /* bUnitID */
   0x01,                                 /* bSourceID */
-  0x01,                                 /* bControlSize */
+  0x02,                                 /* bControlSize */
   AUDIO_CONTROL_MUTE,                   /* bmaControls(0) */
-  0,                                    /* bmaControls(1) */
+  AUDIO_CONTROL_VOLUME,                 /* bmaControls(1) */
+  0,                                    /* bmaControls(2) */
   0x00,                                 /* iTerminal */
   /* 09 byte*/
 
@@ -269,7 +270,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[USB_AUDIO_CONFIG_DESC_SIZ] __ALI
   0x0B,                                 /* bLength */
   AUDIO_INTERFACE_DESCRIPTOR_TYPE,      /* bDescriptorType */
   AUDIO_STREAMING_FORMAT_TYPE,          /* bDescriptorSubtype */
-  AUDIO_FORMAT_TYPE_I,                /* bFormatType */
+  AUDIO_FORMAT_TYPE_I,                  /* bFormatType */
   0x02,                                 /* bNrChannels */
   0x02,                                 /* bSubFrameSize :  2 Bytes per frame (16bits) */
   16,                                   /* bBitResolution (16-bits per sample) */
