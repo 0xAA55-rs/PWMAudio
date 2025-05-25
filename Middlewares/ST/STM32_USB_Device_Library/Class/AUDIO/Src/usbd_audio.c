@@ -540,18 +540,28 @@ static uint8_t  USBD_AUDIO_EP0_RxReady(USBD_HandleTypeDef *pdev)
 
   if (haudio->control.cmd == AUDIO_REQ_SET_CUR)
   {
-    /* In this driver, to simplify code, only SET_CUR request is managed */
-
-    if (haudio->control.unit == AUDIO_OUT_STREAMING_CTRL)
+    USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
+    switch (haudio->control.unit)
     {
-      USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
-      userdata->MuteCtl(haudio->control.data[0]);
-      haudio->control.cmd = 0U;
-      haudio->control.len = 0U;
+    case AUDIO_OUT_STREAMING_CTRL:
+      switch (haudio->control.feature_control)
+      {
+        case AUDIO_CONTROL_MUTE:
+          return userdata->MuteCtl(haudio->control.channel, haudio->control.data[0]);
+        case AUDIO_CONTROL_VOLUME:
+          return userdata->VolumeCtl(haudio->control.channel, haudio->control.data[0]);
+        default:
+          return USBD_FAIL;
+      }
+      break;
+    default:
+      return USBD_FAIL;
     }
   }
-
-  return USBD_OK;
+  else
+  {
+	return USBD_FAIL;
+  }
 }
 /**
   * @brief  USBD_AUDIO_EP0_TxReady
