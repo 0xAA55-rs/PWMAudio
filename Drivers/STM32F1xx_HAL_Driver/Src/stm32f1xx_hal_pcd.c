@@ -2246,21 +2246,28 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
         {
           /* Get SETUP Packet */
           ep->xfer_count = PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
+          uint32_t setup_xfers = ep->xfer_count;
+          uint32_t pmaaddr_offset = 0;
 
-          if (ep->xfer_count > sizeof hpcd->Setup)
+          // 它的每次使用的 Setup 的数据是 8 个字节，因此每 8 字节进行一次 Setup。
+          // 这样做了以后，好像某些播放器还是不能切歌，但是重新插拔 USB 却能使声卡恢复工作状态了。
+          while (setup_xfers >= 8)
           {
-            return HAL_ERROR;
+            USB_ReadPMA(hpcd->Instance, (uint8_t *)hpcd->Setup,
+                        ep->pmaadress + pmaaddr_offset, 8);
+            pmaaddr_offset += 8;
+            setup_xfers -= 8;
+
+            /* Process SETUP Packet*/
+#if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
+            hpcd->SetupStageCallback(hpcd);
+#else
+            HAL_PCD_SetupStageCallback(hpcd);
+#endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
           }
 
           /* SETUP bit kept frozen while CTR_RX = 1 */
           PCD_CLEAR_RX_EP_CTR(hpcd->Instance, PCD_ENDP0);
-
-          /* Process SETUP Packet*/
-#if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
-          hpcd->SetupStageCallback(hpcd);
-#else
-          HAL_PCD_SetupStageCallback(hpcd);
-#endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
         }
         else if ((wEPVal & USB_EP_CTR_RX) != 0U)
         {
