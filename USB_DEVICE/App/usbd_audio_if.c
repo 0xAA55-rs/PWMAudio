@@ -202,13 +202,9 @@ static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
     break;
 
     case AUDIO_CMD_PLAY:
-      is_muted_l = 0;
-      is_muted_r = 0;
     break;
 
     case AUDIO_CMD_STOP:
-      is_muted_l = 1;
-      is_muted_r = 1;
     break;
   }
   return (USBD_OK);
