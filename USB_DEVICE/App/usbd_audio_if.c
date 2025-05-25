@@ -319,28 +319,6 @@ static int8_t AUDIO_GetState_FS(void)
   /* USER CODE END 6 */
 }
 
-/**
-  * @brief  Manages the DMA full transfer complete event.
-  * @retval None
-  */
-void TransferComplete_CallBack_FS(void)
-{
-  /* USER CODE BEGIN 7 */
-  assert(0);
-  /* USER CODE END 7 */
-}
-
-/**
-  * @brief  Manages the DMA Half transfer complete event.
-  * @retval None
-  */
-void HalfTransfer_CallBack_FS(void)
-{
-  /* USER CODE BEGIN 8 */
-  assert(0);
-  /* USER CODE END 8 */
-}
-
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
