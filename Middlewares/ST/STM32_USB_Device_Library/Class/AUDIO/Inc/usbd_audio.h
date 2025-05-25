@@ -135,6 +135,8 @@ typedef struct
   uint8_t data[USB_MAX_EP0_SIZE];
   uint8_t len;
   uint8_t unit;
+  uint8_t channel;
+  uint8_t feature_control;
 }
 USBD_AUDIO_ControlTypeDef;
 

@@ -700,6 +700,8 @@ static void AUDIO_REQ_SetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef 
     haudio->control.cmd = AUDIO_REQ_SET_CUR;     /* Set the request value */
     haudio->control.len = (uint8_t)req->wLength; /* Set the request data length */
     haudio->control.unit = HIBYTE(req->wIndex);  /* Set the request target unit */
+    haudio->control.channel = LOBYTE(req->wValue);
+    haudio->control.feature_control = HIBYTE(req->wValue);
   }
 }
 
