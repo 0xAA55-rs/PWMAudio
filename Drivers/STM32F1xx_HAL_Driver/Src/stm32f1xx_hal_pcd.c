@@ -2249,13 +2249,20 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
           /* Get SETUP Packet */
           ep->xfer_count = PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
+          size_t xfer_count = ep->xfer_count;
 
           /* Prevent out-of-bounds writing of arrays. */
-          if (ep->xfer_count < 8 || ep->xfer_count > sizeof hpcd->Setup)
+          if (xfer_count < 8)
           {
-            USBD_LL_StallEP(pdev, 0x80U);
-            USBD_LL_StallEP(pdev, 0U);
+            HAL_PCD_EP_SetStall(hpcd, 0x80U);
+            HAL_PCD_EP_SetStall(hpcd, 0x00U);
             goto after_process_setup;
+          }
+
+          if (xfer_count > sizeof hpcd->Setup)
+          {
+            // Truncated read
+            xfer_count = sizeof hpcd->Setup;
           }
 
           USB_ReadPMA
@@ -2263,7 +2270,7 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 			hpcd->Instance,
             (uint8_t *)hpcd->Setup,
             ep->pmaadress,
-			ep->xfer_count
+			xfer_count
           );
 
           /* Process SETUP Packet*/
