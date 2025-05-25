@@ -52,7 +52,8 @@ uint16_t pwm_ch1_buffer[BUFFER_SIZE];
 uint16_t pwm_ch2_buffer[BUFFER_SIZE];
 uint16_t* pwm_ch1_buffer_half = &pwm_ch1_buffer[BUFFER_SIZE / 2];
 uint16_t* pwm_ch2_buffer_half = &pwm_ch2_buffer[BUFFER_SIZE / 2];
-uint16_t pwm_mute_buffer[MUTE_BUFFER_SIZE];
+int is_muted_l = 0;
+int is_muted_r = 0;
 const uint16_t mute_val = 32768 * 1500 / 65535;
 int is_muted = 0;
 uint32_t Volume_Modifier = 100;
@@ -69,13 +70,6 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void Main_SetPlayMuteBuffers()
-{
-  HAL_DMA_Abort_IT(&hdma_tim2_ch1);
-  HAL_DMA_Abort(&hdma_tim2_ch2_ch4);
-  HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)&pwm_mute_buffer, (uint32_t)&TIM2->CCR1, MUTE_BUFFER_SIZE);
-  HAL_DMA_Start(&hdma_tim2_ch2_ch4, (uint32_t)&pwm_mute_buffer, (uint32_t)&TIM2->CCR2, MUTE_BUFFER_SIZE);
-}
 void Main_SetPlayAudioBuffers()
 {
   HAL_DMA_Abort_IT(&hdma_tim2_ch1);
@@ -116,20 +110,6 @@ uint32_t Main_GetEndPosition()
 uint32_t Main_GetHalfPosition()
 {
   return BUFFER_SIZE / 2;
-}
-void Main_SetMute()
-{
-  if (pwm_mute_buffer[0] != mute_val)
-  {
-    for (size_t i = 0; i < MUTE_BUFFER_SIZE; i++)
-    {
-      pwm_mute_buffer[i] = mute_val;
-    }
-  }
-  Main_StopPlay();
-  Main_SetPlayMuteBuffers();
-  is_muted = 1;
-  Main_StartPlay();
 }
 void Main_SetUnMute()
 {
