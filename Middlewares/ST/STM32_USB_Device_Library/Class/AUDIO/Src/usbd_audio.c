@@ -407,7 +407,7 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
 
   switch (req->bmRequest & USB_REQ_TYPE_MASK)
   {
-    case USB_REQ_TYPE_CLASS :
+    case USB_REQ_TYPE_CLASS:
       switch (req->bRequest)
       {
         case AUDIO_REQ_GET_CUR:
@@ -450,7 +450,7 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
           }
           break;
 
-        case USB_REQ_GET_INTERFACE :
+        case USB_REQ_GET_INTERFACE:
           if (pdev->dev_state == USBD_STATE_CONFIGURED)
           {
             USBD_CtlSendData(pdev, (uint8_t *)(void *)&haudio->alt_setting, 1U);
@@ -462,7 +462,7 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
           }
           break;
 
-        case USB_REQ_SET_INTERFACE :
+        case USB_REQ_SET_INTERFACE:
           if (pdev->dev_state == USBD_STATE_CONFIGURED)
           {
             if ((uint8_t)(req->wValue) <= USBD_MAX_NUM_INTERFACES)
