@@ -192,13 +192,10 @@ static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
   switch(cmd)
   {
     case AUDIO_CMD_START:
+      Main_StopPlayTimer();
       ConvertS16LEStereoToPWM(haudio.buffer, pwm_ch1_buffer, pwm_ch2_buffer, BUFFER_SIZE);
-      volume_all = 100;
-      volume_l = 100;
-      volume_r = 100;
-      is_muted_all = 0;
-      is_muted_l = 0;
-      is_muted_r = 0;
+      Main_ResetDMAPosition();
+      Main_StartPlayTimer();
     break;
 
     case AUDIO_CMD_PLAY:
