@@ -2251,6 +2251,12 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
           // 它的每次使用的 Setup 的数据是 8 个字节，因此每 8 字节进行一次 Setup。
           // 这样做了以后，好像某些播放器还是不能切歌，但是重新插拔 USB 却能使声卡恢复工作状态了。
+          //
+          // TODO
+          // 哦我现在知道怎么做了。用 `USBD_ParseSetupRequest()`分析数据，可以得到一个 `USBD_SetupReqTypedef`
+          // 而这个 `USBD_SetupReqTypedef` 的后面是有数据的。
+          // 把 `USBD_SetupReqTypedef` 和它的数据一起丢给 `HAL_PCD_SetupStageCallback()` 来处理，直到全部处理完。
+          // 估计类似音量控制等信号也就能接收进来了。
           while (setup_xfers >= 8)
           {
             USB_ReadPMA(hpcd->Instance, (uint8_t *)hpcd->Setup,
