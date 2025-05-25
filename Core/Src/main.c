@@ -54,8 +54,6 @@ uint16_t* pwm_ch1_buffer_half = &pwm_ch1_buffer[BUFFER_SIZE / 2];
 uint16_t* pwm_ch2_buffer_half = &pwm_ch2_buffer[BUFFER_SIZE / 2];
 int is_muted_l = 0;
 int is_muted_r = 0;
-const uint16_t mute_val = 32768 * 1500 / 65535;
-int is_muted = 0;
 uint32_t Volume_Modifier = 100;
 /* USER CODE END PV */
 
@@ -89,16 +87,9 @@ int Main_IsPlaying()
 {
   return htim2.Instance->CR1 & TIM_CR1_CEN ? 1 : 0;
 }
-void Main_SetUnMute()
 {
-  Main_StopPlay();
-  Main_SetPlayAudioBuffers();
-  is_muted = 0;
-  Main_StartPlay();
 }
-int Main_IsMute()
 {
-  return is_muted;
 }
 void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count)
 {
@@ -117,7 +108,6 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
 }
 void OnHalf(DMA_HandleTypeDef *hdma)
 {
-  if (is_muted) return;
   ConvertS16LEStereoToPWM
   (
     &haudio.buffer[0],
@@ -128,7 +118,6 @@ void OnHalf(DMA_HandleTypeDef *hdma)
 }
 void OnCplt(DMA_HandleTypeDef *hdma)
 {
-  if (is_muted) return;
   ConvertS16LEStereoToPWM
   (
     &haudio.buffer[AUDIO_HALF_BUF_SIZE],
@@ -178,7 +167,6 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1 | TIM_DMA_CC2);
-  Main_SetMute();
   /* USER CODE END 2 */
 
   /* Infinite loop */
