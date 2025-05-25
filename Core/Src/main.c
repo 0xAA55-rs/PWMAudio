@@ -54,7 +54,8 @@ uint16_t* pwm_ch1_buffer_half = &pwm_ch1_buffer[BUFFER_SIZE / 2];
 uint16_t* pwm_ch2_buffer_half = &pwm_ch2_buffer[BUFFER_SIZE / 2];
 int is_muted_l = 0;
 int is_muted_r = 0;
-uint32_t Volume_Modifier = 100;
+uint32_t volume_l = 100;
+uint32_t volume_r = 100;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,14 +97,16 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
   int16_t* S16LEInterleaved = (int16_t*)Buffer;
   for (size_t i = 0; i < Count; i++)
   {
-  uint16_t U16_L = (uint16_t)(S16LEInterleaved[i * 2 + 0]) + 32768;
-  uint16_t U16_R = (uint16_t)(S16LEInterleaved[i * 2 + 1]) + 32768;
-  uint16_t PWM_L = U16_L * 1500 / 65535;
-  uint16_t PWM_R = U16_R * 1500 / 65535;
-  Target_L[i] = PWM_L * Volume_Modifier / 100;
-  Target_R[i] = PWM_R * Volume_Modifier / 100;
-  S16LEInterleaved[i * 2 + 0] = 0;
-  S16LEInterleaved[i * 2 + 1] = 0;
+    uint16_t U16_L = (uint16_t)(S16LEInterleaved[i * 2 + 0]) + 32768;
+    uint16_t U16_R = (uint16_t)(S16LEInterleaved[i * 2 + 1]) + 32768;
+    if (is_muted_l) U16_L = 32768;
+    if (is_muted_r) U16_R = 32768;
+    uint16_t PWM_L = U16_L * 1500 / 65535;
+    uint16_t PWM_R = U16_R * 1500 / 65535;
+    Target_L[i] = PWM_L * volume_l / 100;
+    Target_R[i] = PWM_R * volume_r / 100;
+    S16LEInterleaved[i * 2 + 0] = 0;
+    S16LEInterleaved[i * 2 + 1] = 0;
   }
 }
 void OnHalf(DMA_HandleTypeDef *hdma)
