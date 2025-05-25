@@ -101,10 +101,10 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
     if (is_muted_all || is_muted_r) U16_R = 32768;
     uint16_t PWM_L = U16_L * 1500 / 65535;
     uint16_t PWM_R = U16_R * 1500 / 65535;
-    PWM_L *= volume_all / 100;
-    PWM_R *= volume_all / 100;
-    PWM_L *= volume_l / 100;
-    PWM_R *= volume_r / 100;
+    PWM_L = PWM_L * volume_all / 100;
+    PWM_R = PWM_R * volume_all / 100;
+    PWM_L = PWM_L * volume_l / 100;
+    PWM_R = PWM_R * volume_r / 100;
     Target_L[i] = PWM_L;
     Target_R[i] = PWM_R;
     S16LEInterleaved[i * 2 + 0] = 0;
