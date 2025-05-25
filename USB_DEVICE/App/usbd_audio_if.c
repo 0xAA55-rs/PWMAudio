@@ -118,8 +118,10 @@ extern uint32_t Volume_Modifier;
 static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t options);
 static int8_t AUDIO_DeInit_FS(uint32_t options);
 static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd);
-static int8_t AUDIO_VolumeCtl_FS(uint8_t vol);
-static int8_t AUDIO_MuteCtl_FS(uint8_t cmd);
+static int8_t AUDIO_VolumeCtl_FS(uint8_t channel, uint8_t vol);
+static int8_t AUDIO_MuteCtl_FS(uint8_t channel, uint8_t cmd);
+static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol);
+static int8_t AUDIO_MuteGet_FS(uint8_t channel, uint8_t *cmd);
 static int8_t AUDIO_PeriodicTC_FS(uint8_t cmd);
 static int8_t AUDIO_GetState_FS(void);
 
@@ -138,6 +140,8 @@ USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_FS =
   AUDIO_AudioCmd_FS,
   AUDIO_VolumeCtl_FS,
   AUDIO_MuteCtl_FS,
+  AUDIO_VolumeGet_FS,
+  AUDIO_MuteGet_FS,
   AUDIO_PeriodicTC_FS,
   AUDIO_GetState_FS
 };
@@ -254,6 +258,47 @@ static int8_t AUDIO_MuteCtl_FS(uint8_t channel, uint8_t cmd)
   /* USER CODE END 4 */
 }
 
+/**
+  * @brief  Controls AUDIO Volume
+  * @param  channel: audio channel, 0=left, 1=right
+  * @param  vol: pointer to output the volume level (0..100)
+  * @retval USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol)
+{
+  switch(channel)
+  {
+  case 0:
+	*vol = volume_l;
+	return USBD_OK;
+  case 1:
+	*vol = volume_r;
+	return USBD_OK;
+  default:
+    return USBD_FAIL;
+  }
+}
+
+/**
+  * @brief  Controls AUDIO Mute.
+  * @param  channel: audio channel, 0=left, 1=right
+  * @param  mute: pointer to output the state of muted or not
+  * @retval USBD_OK if all operations are OK else USBD_FAIL
+  */
+static int8_t AUDIO_MuteGet_FS(uint8_t channel, uint8_t *mute)
+{
+  switch(channel)
+  {
+  case 0:
+	*mute = is_muted_l;
+	return USBD_OK;
+  case 1:
+	*mute = is_muted_r;
+	return USBD_OK;
+  default:
+    return USBD_FAIL;
+  }
+}
 /**
   * @brief  AUDIO_PeriodicT_FS
   * @param  cmd: Command opcode
