@@ -77,13 +77,6 @@ void Main_SetPlayAudioBuffers()
   HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)&pwm_ch1_buffer, (uint32_t)&TIM2->CCR1, BUFFER_SIZE);
   HAL_DMA_Start(&hdma_tim2_ch2_ch4, (uint32_t)&pwm_ch2_buffer, (uint32_t)&TIM2->CCR2, BUFFER_SIZE);
 }
-void Main_SetPlayPosition(uint32_t position)
-{
-  assert(position < BUFFER_SIZE);
-  if (is_muted) return;
-  hdma_tim2_ch1.Instance->CMAR = (uint32_t)&pwm_ch1_buffer[position];
-  hdma_tim2_ch2_ch4.Instance->CMAR = (uint32_t)&pwm_ch2_buffer[position];
-}
 void Main_StartPlay()
 {
   if (!Main_IsPlaying()) HAL_TIM_Base_Start(&htim2);
@@ -95,21 +88,6 @@ void Main_StopPlay()
 int Main_IsPlaying()
 {
   return htim2.Instance->CR1 & TIM_CR1_CEN ? 1 : 0;
-}
-uint32_t Main_GetPlayPosition()
-{
-  if (is_muted)
-    return 0;
-  else
-    return hdma_tim2_ch1.Instance->CMAR - (uint32_t)&pwm_ch1_buffer[0];
-}
-uint32_t Main_GetEndPosition()
-{
-  return BUFFER_SIZE;
-}
-uint32_t Main_GetHalfPosition()
-{
-  return BUFFER_SIZE / 2;
 }
 void Main_SetUnMute()
 {
