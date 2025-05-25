@@ -152,13 +152,13 @@ USBD_ClassTypeDef  USBD_AUDIO =
 };
 
 /* USB AUDIO device Configuration Descriptor */
-__ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[USB_AUDIO_CONFIG_DESC_SIZ] __ALIGN_END =
+__ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
 {
   /* Configuration 1 */
   0x09,                                 /* bLength */
   USB_DESC_TYPE_CONFIGURATION,          /* bDescriptorType */
-  LOBYTE(USB_AUDIO_CONFIG_DESC_SIZ),    /* wTotalLength  109 bytes*/
-  HIBYTE(USB_AUDIO_CONFIG_DESC_SIZ),
+  0, /* wTotalLength */
+  0,
   0x02,                                 /* bNumInterfaces */
   0x01,                                 /* bConfigurationValue */
   0x00,                                 /* iConfiguration */
@@ -216,7 +216,6 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[USB_AUDIO_CONFIG_DESC_SIZ] __ALI
   AUDIO_CONTROL_VOLUME,                 /* bmaControls(1) */
   0,                                    /* bmaControls(2) */
   0x00,                                 /* iTerminal */
-  /* 09 byte*/
 
   /*USB Speaker Output Terminal Descriptor */
   0x09,      /* bLength */
@@ -510,6 +509,8 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
 static uint8_t  *USBD_AUDIO_GetCfgDesc(uint16_t *length)
 {
   *length = sizeof(USBD_AUDIO_CfgDesc);
+
+  *(uint16_t*)&USBD_AUDIO_CfgDesc[2] = sizeof(USBD_AUDIO_CfgDesc);
 
   return USBD_AUDIO_CfgDesc;
 }
