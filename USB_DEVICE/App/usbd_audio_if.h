@@ -105,7 +105,7 @@ extern int is_muted_r;
 /* USER CODE END EXPORTED_VARIABLES */
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
-extern void Main_SetPlayAudioBuffers();
+extern void Main_ResetDMAPosition();
 extern void Main_StartPlayTimer();
 extern void Main_StopPlayTimer();
 extern int Main_IsPlayTimerOn();

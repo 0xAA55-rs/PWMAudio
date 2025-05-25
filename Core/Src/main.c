@@ -71,7 +71,7 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void Main_SetPlayAudioBuffers()
+void Main_ResetDMAPosition()
 {
   HAL_DMA_Abort_IT(&hdma_tim2_ch1);
   HAL_DMA_Abort(&hdma_tim2_ch2_ch4);
