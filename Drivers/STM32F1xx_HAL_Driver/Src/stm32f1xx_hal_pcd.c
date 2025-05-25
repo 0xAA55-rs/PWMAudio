@@ -2244,78 +2244,36 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
         if ((wEPVal & USB_EP_SETUP) != 0U)
         {
-          // Setup handling here. The Setup data from the host is located in the PMA area of EP0.
-          // Each Setup packet consists of an 8-byte header followed by optional data.
-          // First, read the header. Note that the header fields are stored in big-endian format and need to be converted to little-endian.
-          // Then check the `wLength` field in the header to determine if there's additional data.
-          // If data exists, read it as well.
-          // After reading all contents and storing them in `hpcd->Setup`, pass control to `HAL_PCD_SetupStageCallback()` for processing.
-          // Continue the loop until all Setup requests are processed.
-          typedef struct _
-          {
-            uint8_t   bmRequest;
-            uint8_t   bRequest;
-            uint16_t  wValue;
-            uint16_t  wIndex;
-            uint16_t  wLength;
-          } USBD_SetupReqTypedef;
+          extern void* memset(void *, int, size_t);
+          memset(hpcd->Setup, 0, sizeof hpcd->Setup);
 
           /* Get SETUP Packet */
           ep->xfer_count = PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
-          size_t setup_xfers = ep->xfer_count;
-          size_t pmaaddr_offset = 0;
 
-          while (setup_xfers >= 8)
+          /* Prevent out-of-bounds writing of arrays. */
+          if (ep->xfer_count < 8 || ep->xfer_count > sizeof hpcd->Setup)
           {
-            extern void* memset(void *, int, size_t);
-            memset(hpcd->Setup, 0, sizeof hpcd->Setup);
-            USB_ReadPMA
-			(
-			  hpcd->Instance,
-              (uint8_t *)hpcd->Setup,
-              ep->pmaadress + pmaaddr_offset,
-			  8
-			);
-            pmaaddr_offset += 8;
-            setup_xfers -= 8;
-            size_t space_for_payload = sizeof hpcd->Setup - 8;
-            uint8_t* ptr = (uint8_t *)hpcd->Setup;
-            USBD_SetupReqTypedef req =
-            {
-              ptr[0], // bmRequest
-              ptr[1], // bRequest
-              ((uint16_t)(ptr[2]) << 8) | (uint16_t)(ptr[3]), // wValue
-              ((uint16_t)(ptr[4]) << 8) | (uint16_t)(ptr[5]), // wIndex
-              ((uint16_t)(ptr[6]) << 8) | (uint16_t)(ptr[7]), // wLength
-            };
-            if (req.wLength <= space_for_payload)
-            {
-              USB_ReadPMA
-              (
-                hpcd->Instance,
-                (uint8_t *)hpcd->Setup + 8,
-                ep->pmaadress + pmaaddr_offset,
-				req.wLength
-              );
-              pmaaddr_offset += req.wLength;
-              setup_xfers -= req.wLength;
-            }
-            else
-            {
-              // The payload is too long, there's no way to handle it. Skip this packet.
-              pmaaddr_offset += req.wLength;
-              setup_xfers -= req.wLength;
-              continue;
-            }
-
-            /* Process SETUP Packet*/
-#if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
-            hpcd->SetupStageCallback(hpcd);
-#else
-            HAL_PCD_SetupStageCallback(hpcd);
-#endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
+            USBD_LL_StallEP(pdev, 0x80U);
+            USBD_LL_StallEP(pdev, 0U);
+            goto after_process_setup;
           }
 
+          USB_ReadPMA
+          (
+			hpcd->Instance,
+            (uint8_t *)hpcd->Setup,
+            ep->pmaadress,
+			ep->xfer_count
+          );
+
+          /* Process SETUP Packet*/
+#if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
+          hpcd->SetupStageCallback(hpcd);
+#else
+          HAL_PCD_SetupStageCallback(hpcd);
+#endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
+
+          after_process_setup:
           /* SETUP bit kept frozen while CTR_RX = 1 */
           PCD_CLEAR_RX_EP_CTR(hpcd->Instance, PCD_ENDP0);
         }
