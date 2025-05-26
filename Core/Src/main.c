@@ -55,9 +55,9 @@ uint16_t* pwm_ch2_buffer_half = &pwm_ch2_buffer[BUFFER_SIZE / 2];
 int is_muted_all = 0;
 int is_muted_l = 0;
 int is_muted_r = 0;
-uint32_t volume_all = 100;
-uint32_t volume_l = 100;
-uint32_t volume_r = 100;
+int volume_all = 100;
+int volume_l = 100;
+int volume_r = 100;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -95,16 +95,18 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
   int16_t* S16LEInterleaved = (int16_t*)Buffer;
   for (size_t i = 0; i < Count; i++)
   {
-    uint16_t U16_L = (uint16_t)(S16LEInterleaved[i * 2 + 0]) + 32768;
-    uint16_t U16_R = (uint16_t)(S16LEInterleaved[i * 2 + 1]) + 32768;
+    int16_t S16_L = S16LEInterleaved[i * 2 + 0];
+    int16_t S16_R = S16LEInterleaved[i * 2 + 1];
+    S16_L = S16_L * volume_all / 100;
+    S16_R = S16_R * volume_all / 100;
+    S16_L = S16_L * volume_l / 100;
+    S16_R = S16_R * volume_r / 100;
+    uint16_t U16_L = (uint16_t)S16_L + 32768;
+    uint16_t U16_R = (uint16_t)S16_R + 32768;
     if (is_muted_all || is_muted_l) U16_L = 32768;
     if (is_muted_all || is_muted_r) U16_R = 32768;
     uint16_t PWM_L = U16_L * 1500 / 65535;
     uint16_t PWM_R = U16_R * 1500 / 65535;
-    PWM_L = PWM_L * volume_all / 100;
-    PWM_R = PWM_R * volume_all / 100;
-    PWM_L = PWM_L * volume_l / 100;
-    PWM_R = PWM_R * volume_r / 100;
     Target_L[i] = PWM_L;
     Target_R[i] = PWM_R;
     S16LEInterleaved[i * 2 + 0] = 0;
