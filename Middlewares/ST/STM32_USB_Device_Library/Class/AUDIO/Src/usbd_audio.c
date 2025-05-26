@@ -279,6 +279,16 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   AUDIO_SAMPLE_FREQ(USBD_AUDIO_FREQ),   /* Audio sampling frequency coded on 3 bytes */
   /* 11 byte*/
 
+  /* Endpoint - Audio Streaming Descriptor */
+  AUDIO_STREAMING_ENDPOINT_DESC_SIZE,   /* bLength */
+  AUDIO_ENDPOINT_DESCRIPTOR_TYPE,       /* bDescriptorType */
+  AUDIO_ENDPOINT_GENERAL,               /* bDescriptor */
+  0x00,                                 /* bmAttributes */
+  0x00,                                 /* bLockDelayUnits */
+  0x00,                                 /* wLockDelay */
+  0x00,
+  /* 07 byte*/
+
   /* Endpoint 1 - Standard Descriptor */
   AUDIO_STANDARD_ENDPOINT_DESC_SIZE,    /* bLength */
   USB_DESC_TYPE_ENDPOINT,               /* bDescriptorType */
@@ -290,15 +300,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   0x00,                                 /* bSynchAddress */
   /* 09 byte*/
 
-  /* Endpoint - Audio Streaming Descriptor*/
-  AUDIO_STREAMING_ENDPOINT_DESC_SIZE,   /* bLength */
-  AUDIO_ENDPOINT_DESCRIPTOR_TYPE,       /* bDescriptorType */
-  AUDIO_ENDPOINT_GENERAL,               /* bDescriptor */
-  0x00,                                 /* bmAttributes */
-  0x00,                                 /* bLockDelayUnits */
-  0x00,                                 /* wLockDelay */
   0x00,
-  /* 07 byte*/
 };
 
 /* USB Standard Device Descriptor */
