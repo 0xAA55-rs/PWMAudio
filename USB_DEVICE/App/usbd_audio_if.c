@@ -160,8 +160,8 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
   if (AudioFreq != 48000) return USBD_FAIL;
   memset(&haudio.buffer, 0, sizeof haudio.buffer);
   volume_all = Volume;
-  volume_l = 100;
-  volume_r = 100;
+  volume_l = max_volume;
+  volume_r = max_volume;
   is_muted_all = 0;
   return (USBD_OK);
   /* USER CODE END 0 */
