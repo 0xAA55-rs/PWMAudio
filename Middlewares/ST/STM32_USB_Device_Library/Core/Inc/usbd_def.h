@@ -145,6 +145,9 @@ extern "C" {
 #define USBD_EP_TYPE_ISOC                               0x01U
 #define USBD_EP_TYPE_BULK                               0x02U
 #define USBD_EP_TYPE_INTR                               0x03U
+#define USBD_EP_TYPE_ADAPTISOC                          0x09U
+#define USBD_EP_TYPE_ASYNCISOC                          0x05U
+#define USBD_EP_TYPE_SYNCISOC                           0x0DU
 
 
 /**
