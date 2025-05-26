@@ -122,11 +122,11 @@ static uint8_t USBD_AUDIO_SOF(USBD_HandleTypeDef *pdev);
 
 static uint8_t USBD_AUDIO_IsoINIncomplete(USBD_HandleTypeDef *pdev, uint8_t epnum);
 static uint8_t USBD_AUDIO_IsoOutIncomplete(USBD_HandleTypeDef *pdev, uint8_t epnum);
-static void AUDIO_REQ_GetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
-static void AUDIO_REQ_SetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
+static void AUDIO_REQ_GetCur(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
 static void AUDIO_REQ_GetMin(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
 static void AUDIO_REQ_GetMax(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
 static void AUDIO_REQ_GetRes(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
+static void AUDIO_REQ_SetCur(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
 
 /**
   * @}
@@ -675,13 +675,13 @@ static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
 }
 
 /**
-  * @brief  AUDIO_Req_GetCurrent
+  * @brief  AUDIO_Req_GetCur
   *         Handles the GET_CUR Audio control request.
   * @param  pdev: instance
   * @param  req: setup class request
   * @retval status
   */
-static void AUDIO_REQ_GetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
+static void AUDIO_REQ_GetCur(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
   USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
   USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
@@ -795,7 +795,7 @@ static void AUDIO_REQ_GetRes(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req
   * @param  req: setup class request
   * @retval status
   */
-static void AUDIO_REQ_SetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
+static void AUDIO_REQ_SetCur(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
   USBD_AUDIO_HandleTypeDef   *haudio;
   haudio = (USBD_AUDIO_HandleTypeDef *) pdev->pClassData;
