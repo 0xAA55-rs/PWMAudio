@@ -187,7 +187,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   AUDIO_CONTROL_HEADER,                 /* bDescriptorSubtype */
   0x00,          /* 1.00 */             /* bcdADC */
   0x01,
-  (AUDIO_INPUT_TERMINAL_DESC_SIZE + 0x09 + 0x09 + AUDIO_INTERFACE_DESC_SIZE), /* wTotalLength */
+  (AUDIO_INPUT_TERMINAL_DESC_SIZE + 0x0A + 0x09 + AUDIO_INTERFACE_DESC_SIZE), /* wTotalLength */
   0x00,
   0x01,                                 /* bInCollection */
   0x01,                                 /* baInterfaceNr */
@@ -201,7 +201,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   0x01,                                 /* wTerminalType AUDIO_TERMINAL_USB_STREAMING   0x0101 */
   0x01,
   0x00,                                 /* bAssocTerminal */
-  0x01,                                 /* bNrChannels */
+  0x02,                                 /* bNrChannels */
   0x00,                                 /* wChannelConfig 0x0000  Mono */
   0x00,
   0x00,                                 /* iChannelNames */
@@ -209,14 +209,15 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   /* 12 byte*/
 
   /* USB Speaker Audio Feature Unit Descriptor */
-  0x09,                                 /* bLength */
+  0x0A,                                 /* bLength */
   AUDIO_INTERFACE_DESCRIPTOR_TYPE,      /* bDescriptorType */
   AUDIO_CONTROL_FEATURE_UNIT,           /* bDescriptorSubtype */
   AUDIO_OUT_STREAMING_CTRL,             /* bUnitID */
   0x01,                                 /* bSourceID */
   0x01,                                 /* bControlSize */
   AUDIO_CONTROL_MUTE | AUDIO_CONTROL_VOLUME, /* bmaControls(0) */
-  AUDIO_CONTROL_MUTE | AUDIO_CONTROL_VOLUME, /* bmaControls(1) */
+  AUDIO_CONTROL_VOLUME, /* bmaControls(1) */
+  AUDIO_CONTROL_VOLUME, /* bmaControls(2) */
   0x00,                                 /* iTerminal */
 
   /*USB Speaker Output Terminal Descriptor */
