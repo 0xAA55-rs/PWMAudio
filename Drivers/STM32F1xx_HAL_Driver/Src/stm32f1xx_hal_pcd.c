@@ -2276,6 +2276,8 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
           if (ep->xfer_count != 8)
           {
+            HAL_PCD_EP_SetStall(hpcd, 0x80);
+            HAL_PCD_EP_SetStall(hpcd, 0x00);
             goto after_process_setup;
           }
 
