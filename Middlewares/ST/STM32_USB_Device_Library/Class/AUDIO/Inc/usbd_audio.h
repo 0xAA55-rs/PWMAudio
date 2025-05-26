@@ -99,7 +99,7 @@ extern "C" {
 #define AUDIO_OUT_STREAMING_CTRL                      0x02U
 
 #define AUDIO_OUT_PACKET                              (uint16_t)(((USBD_AUDIO_FREQ * 2U * 2U) / 1000U))
-#define AUDIO_DEFAULT_VOLUME                          100
+#define AUDIO_DEFAULT_VOLUME                          max_volume
 
 /* Number of sub-packets in the audio transfer buffer. You can modify this value but always make sure
   that it is an even number and higher than 3 */
@@ -190,6 +190,7 @@ typedef struct
   */
 
 extern USBD_ClassTypeDef  USBD_AUDIO;
+extern const int max_volume;
 #define USBD_AUDIO_CLASS    &USBD_AUDIO
 /**
   * @}
