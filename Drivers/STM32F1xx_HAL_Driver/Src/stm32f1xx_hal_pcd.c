@@ -2253,7 +2253,6 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
           uint8_t *ptr = (uint8_t *)hpcd->Setup;
 
           USB_ReadPMA(hpcd->Instance, ptr, ep->pmaadress, max_xfer_count);
-          // USB_ClearPMA(hpcd->Instance, ep->pmaadress, ep->xfer_count);
 
           /*
           typedef  struct  usb_setup_req
