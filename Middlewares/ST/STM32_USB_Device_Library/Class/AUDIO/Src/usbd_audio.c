@@ -299,8 +299,6 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   0x00,                                 /* bRefresh */
   0x00,                                 /* bSynchAddress */
   /* 09 byte*/
-
-  0x00,
 };
 
 /* USB Standard Device Descriptor */
