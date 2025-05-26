@@ -563,7 +563,7 @@ static uint8_t  USBD_AUDIO_EP0_RxReady(USBD_HandleTypeDef *pdev)
       switch (haudio->control.feature_control)
       {
         case AUDIO_CONTROL_MUTE:
-          return userdata->MuteCtl(haudio->control.channel, haudio->control.data[0]);
+          return userdata->MuteCtl(haudio->control.data[0]);
         case AUDIO_CONTROL_VOLUME:
           return userdata->VolumeCtl(haudio->control.channel, haudio->control.data[0]);
         default:
@@ -717,7 +717,7 @@ static void AUDIO_REQ_GetCur(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req
   switch (command)
   {
   case AUDIO_CONTROL_MUTE:
-    userdata->MuteGet(channel, &data);
+    userdata->MuteGet(&data);
     USBD_CtlSendData(pdev, &data, 1);
     break;
   case AUDIO_CONTROL_VOLUME:

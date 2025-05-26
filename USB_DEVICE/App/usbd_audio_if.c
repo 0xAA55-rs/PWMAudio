@@ -119,9 +119,9 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
 static int8_t AUDIO_DeInit_FS(uint32_t options);
 static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd);
 static int8_t AUDIO_VolumeCtl_FS(uint8_t channel, uint8_t vol);
-static int8_t AUDIO_MuteCtl_FS(uint8_t channel, uint8_t cmd);
+static int8_t AUDIO_MuteCtl_FS(uint8_t cmd);
 static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol);
-static int8_t AUDIO_MuteGet_FS(uint8_t channel, uint8_t *cmd);
+static int8_t AUDIO_MuteGet_FS(uint8_t *cmd);
 static int8_t AUDIO_PeriodicTC_FS(uint8_t cmd);
 static int8_t AUDIO_GetState_FS(void);
 
@@ -163,8 +163,6 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
   volume_l = 100;
   volume_r = 100;
   is_muted_all = 0;
-  is_muted_l = 0;
-  is_muted_r = 0;
   return (USBD_OK);
   /* USER CODE END 0 */
 }
@@ -236,16 +234,11 @@ static int8_t AUDIO_VolumeCtl_FS(uint8_t channel, uint8_t vol)
   * @param  cmd: command opcode
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_MuteCtl_FS(uint8_t channel, uint8_t cmd)
+static int8_t AUDIO_MuteCtl_FS(uint8_t cmd)
 {
   /* USER CODE BEGIN 4 */
-  switch (channel)
-  {
-  case 0: is_muted_all = cmd; return USBD_OK;
-  case 1: is_muted_l = cmd; return USBD_OK;
-  case 2: is_muted_r = cmd; return USBD_OK;
-  default: return USBD_FAIL;
-  }
+  is_muted_all = cmd;
+  return USBD_OK;
   /* USER CODE END 4 */
 }
 
@@ -279,22 +272,10 @@ static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol)
   * @param  mute: pointer to output the state of muted or not
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t AUDIO_MuteGet_FS(uint8_t channel, uint8_t *mute)
+static int8_t AUDIO_MuteGet_FS(uint8_t *mute)
 {
-  switch(channel)
-  {
-  case 0:
-    *mute = is_muted_all;
-    return USBD_OK;
-  case 1:
-    *mute = is_muted_l;
-    return USBD_OK;
-  case 2:
-    *mute = is_muted_r;
-    return USBD_OK;
-  default:
-    return USBD_FAIL;
-  }
+  *mute = is_muted_all;
+  return USBD_OK;
 }
 /**
   * @brief  AUDIO_PeriodicT_FS

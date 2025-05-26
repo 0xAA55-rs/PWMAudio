@@ -99,8 +99,6 @@ extern int volume_all;
 extern int volume_l;
 extern int volume_r;
 extern int is_muted_all;
-extern int is_muted_l;
-extern int is_muted_r;
 extern const int max_volume;
 /* USER CODE END EXPORTED_VARIABLES */
 
