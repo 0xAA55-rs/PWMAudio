@@ -260,14 +260,14 @@ static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol)
   switch(channel)
   {
   case 0:
-	*vol = volume_all;
-	return USBD_OK;
+    *vol = volume_all;
+    return USBD_OK;
   case 1:
-	*vol = volume_l;
-	return USBD_OK;
+    *vol = volume_l;
+    return USBD_OK;
   case 2:
-	*vol = volume_r;
-	return USBD_OK;
+    *vol = volume_r;
+    return USBD_OK;
   default:
     return USBD_FAIL;
   }
@@ -284,14 +284,14 @@ static int8_t AUDIO_MuteGet_FS(uint8_t channel, uint8_t *mute)
   switch(channel)
   {
   case 0:
-	*mute = is_muted_all;
-	return USBD_OK;
+    *mute = is_muted_all;
+    return USBD_OK;
   case 1:
-	*mute = is_muted_l;
-	return USBD_OK;
+    *mute = is_muted_l;
+    return USBD_OK;
   case 2:
-	*mute = is_muted_r;
-	return USBD_OK;
+    *mute = is_muted_r;
+    return USBD_OK;
   default:
     return USBD_FAIL;
   }
