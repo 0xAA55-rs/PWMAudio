@@ -124,6 +124,9 @@ static uint8_t USBD_AUDIO_IsoINIncomplete(USBD_HandleTypeDef *pdev, uint8_t epnu
 static uint8_t USBD_AUDIO_IsoOutIncomplete(USBD_HandleTypeDef *pdev, uint8_t epnum);
 static void AUDIO_REQ_GetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
 static void AUDIO_REQ_SetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
+static void AUDIO_REQ_GetMin(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
+static void AUDIO_REQ_GetMax(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
+static void AUDIO_REQ_GetRes(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
 
 /**
   * @}
@@ -701,6 +704,87 @@ static void AUDIO_REQ_GetCurrent(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef 
     break;
   default:
 	assert(0);
+  }
+}
+
+/**
+  * @brief  AUDIO_Req_GetMin
+  *         Handles the GET_MIN Audio control request.
+  * @param  pdev: instance
+  * @param  req: setup class request
+  * @retval status
+  */
+static void AUDIO_REQ_GetMin(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
+{
+  uint8_t command = HIBYTE(req->wValue);
+  uint8_t data = 0;
+
+  switch (command)
+  {
+  case AUDIO_CONTROL_MUTE:
+    data = 0;
+    USBD_CtlSendData(pdev, &data, 1);
+    break;
+  case AUDIO_CONTROL_VOLUME:
+    data = 0;
+    USBD_CtlSendData(pdev, &data, 1);
+    break;
+  default:
+  assert(0);
+  }
+}
+
+/**
+  * @brief  AUDIO_REQ_GetMax
+  *         Handles the GET_MAX Audio control request.
+  * @param  pdev: instance
+  * @param  req: setup class request
+  * @retval status
+  */
+static void AUDIO_REQ_GetMax(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
+{
+  uint8_t command = HIBYTE(req->wValue);
+  uint8_t data = 0;
+
+  switch (command)
+  {
+  case AUDIO_CONTROL_MUTE:
+    data = 1;
+    USBD_CtlSendData(pdev, &data, 1);
+    break;
+  case AUDIO_CONTROL_VOLUME:
+    data = 100;
+    USBD_CtlSendData(pdev, &data, 1);
+    break;
+  default:
+  assert(0);
+  }
+}
+
+/**
+  * @brief  AUDIO_REQ_GetRes
+  *         Handles the GET_RES Audio control request.
+  * @param  pdev: instance
+  * @param  req: setup class request
+  * @retval status
+  */
+static void AUDIO_REQ_GetRes(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
+{
+  uint8_t command = HIBYTE(req->wValue);
+  uint8_t data = 0;
+
+  switch (command)
+  {
+  case AUDIO_CONTROL_MUTE:
+    data = 1;
+    USBD_CtlSendData(pdev, &data, 1);
+    break;
+  case AUDIO_CONTROL_VOLUME:
+    data = 1;
+    USBD_CtlSendData(pdev, &data, 1);
+    break;
+  default:
+  assert(0);
   }
 }
 
