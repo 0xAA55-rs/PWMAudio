@@ -215,8 +215,9 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   AUDIO_OUT_STREAMING_CTRL,             /* bUnitID */
   0x01,                                 /* bSourceID */
   0x02,                                 /* bControlSize */
-  AUDIO_CONTROL_MUTE, 0, /* bmaControls(0) */
-  AUDIO_CONTROL_MUTE, 0, /* bmaControls(1) */
+  AUDIO_CONTROL_MUTE | AUDIO_CONTROL_VOLUME, 0, /* bmaControls(0) */
+  AUDIO_CONTROL_MUTE | AUDIO_CONTROL_VOLUME, 0, /* bmaControls(1) */
+  // AUDIO_CONTROL_MUTE | AUDIO_CONTROL_VOLUME, 0, /* bmaControls(2) */
   0x00,                                 /* iTerminal */
 
   /*USB Speaker Output Terminal Descriptor */
