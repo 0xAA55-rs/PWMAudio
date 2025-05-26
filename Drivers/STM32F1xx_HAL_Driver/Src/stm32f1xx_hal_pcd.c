@@ -2249,38 +2249,40 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
           /* Get SETUP Packet */
           ep->xfer_count = PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
-          size_t xfer_count = ep->xfer_count;
+          size_t max_xfer_count = PCD_MIN(ep->xfer_count, sizeof hpcd->Setup);
+          uint8_t *ptr = (uint8_t *)hpcd->Setup;
 
-          /* Prevent out-of-bounds writing of arrays. */
-          if (xfer_count < 8)
+          USB_ReadPMA(hpcd->Instance, ptr, ep->pmaadress, max_xfer_count);
+          // USB_ClearPMA(hpcd->Instance, ep->pmaadress, ep->xfer_count);
+
+          /*
+          typedef  struct  usb_setup_req
           {
-            HAL_PCD_EP_SetStall(hpcd, 0x80U);
-            HAL_PCD_EP_SetStall(hpcd, 0x00U);
+            uint8_t   bmRequest;
+            uint8_t   bRequest;
+            uint16_t  wValue;
+            uint16_t  wIndex;
+            uint16_t  wLength;
+          } USBD_SetupReqTypedef;
+
+          USBD_SetupReqTypedef req =
+          {
+            ptr[0],
+            ptr[1],
+            ptr[3] | (ptr[2] << 8),
+            ptr[5] | (ptr[4] << 8),
+            ptr[7] | (ptr[6] << 8),
+          };
+          */
+
+          if (ep->xfer_count != 8)
+          {
             goto after_process_setup;
-          }
-
-          if (xfer_count > sizeof hpcd->Setup)
-          {
-            // Truncated read
-            xfer_count = sizeof hpcd->Setup;
-          }
-
-          USB_ReadPMA
-          (
-			hpcd->Instance,
-            (uint8_t *)hpcd->Setup,
-            ep->pmaadress,
-			xfer_count
-          );
-
-          if (ep->xfer_count > sizeof hpcd->Setup)
-          {
-            uint32_t header = hpcd->Setup[0];
           }
 
           /* Process SETUP Packet*/
 #if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
-          hpcd->SetupStageCallback(hpcd);
+            hpcd->SetupStageCallback(hpcd);
 #else
           HAL_PCD_SetupStageCallback(hpcd);
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
