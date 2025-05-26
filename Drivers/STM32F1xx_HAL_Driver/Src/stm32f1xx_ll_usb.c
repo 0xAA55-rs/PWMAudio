@@ -2816,28 +2816,16 @@ HAL_StatusTypeDef USB_DeActivateRemoteWakeup(USB_TypeDef *USBx)
   */
 void USB_WritePMA(USB_TypeDef const *USBx, uint8_t *pbUsrBuf, uint16_t wPMABufAddr, uint16_t wNBytes)
 {
-  uint32_t n = ((uint32_t)wNBytes + 1U) >> 1;
-  uint32_t BaseAddr = (uint32_t)USBx;
-  uint32_t count;
-  uint16_t WrVal;
-  __IO uint16_t *pdwVal;
+  size_t n = ((size_t)wNBytes + 1U) >> 1;
+  size_t BaseAddr = (size_t)USBx;
   uint8_t *pBuf = pbUsrBuf;
+  __IO uint16_t *pdwVal = (__IO uint16_t *)(BaseAddr + 0x400U + ((size_t)wPMABufAddr * PMA_ACCESS));
 
-  pdwVal = (__IO uint16_t *)(BaseAddr + 0x400U + ((uint32_t)wPMABufAddr * PMA_ACCESS));
-
-  for (count = n; count != 0U; count--)
+  for (size_t i = 0; i < n; i++)
   {
-    WrVal = pBuf[0];
-    WrVal |= (uint16_t)pBuf[1] << 8;
-    *pdwVal = (WrVal & 0xFFFFU);
-    pdwVal++;
-
-#if PMA_ACCESS > 1U
-    pdwVal++;
-#endif /* PMA_ACCESS */
-
-    pBuf++;
-    pBuf++;
+    *pdwVal = *(uint16_t*)pBuf;
+    pdwVal += PMA_ACCESS;
+    pBuf += 2;
   }
 }
 
@@ -2851,33 +2839,21 @@ void USB_WritePMA(USB_TypeDef const *USBx, uint8_t *pbUsrBuf, uint16_t wPMABufAd
   */
 void USB_ReadPMA(USB_TypeDef const *USBx, uint8_t *pbUsrBuf, uint16_t wPMABufAddr, uint16_t wNBytes)
 {
-  uint32_t n = (uint32_t)wNBytes >> 1;
-  uint32_t BaseAddr = (uint32_t)USBx;
-  uint32_t count;
-  uint32_t RdVal;
-  __IO uint16_t *pdwVal;
+  size_t n = (size_t)wNBytes >> 1;
+  size_t BaseAddr = (size_t)USBx;
   uint8_t *pBuf = pbUsrBuf;
+  __IO uint16_t *pdwVal = (__IO uint16_t *)(BaseAddr + 0x400U + ((size_t)wPMABufAddr * PMA_ACCESS));
 
-  pdwVal = (__IO uint16_t *)(BaseAddr + 0x400U + ((uint32_t)wPMABufAddr * PMA_ACCESS));
-
-  for (count = n; count != 0U; count--)
+  for(size_t i = 0; i < n; i++)
   {
-    RdVal = *(__IO uint16_t *)pdwVal;
-    pdwVal++;
-    *pBuf = (uint8_t)((RdVal >> 0) & 0xFFU);
-    pBuf++;
-    *pBuf = (uint8_t)((RdVal >> 8) & 0xFFU);
-    pBuf++;
-
-#if PMA_ACCESS > 1U
-    pdwVal++;
-#endif /* PMA_ACCESS */
+    *(uint16_t*)pBuf = *pdwVal;
+    pBuf += 2;
+    pdwVal += PMA_ACCESS;
   }
 
-  if ((wNBytes % 2U) != 0U)
+  if (wNBytes & 1)
   {
-    RdVal = *pdwVal;
-    *pBuf = (uint8_t)((RdVal >> 0) & 0xFFU);
+    *pBuf = (uint8_t)(*pdwVal);
   }
 }
 
