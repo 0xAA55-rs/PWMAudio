@@ -559,6 +559,7 @@ static uint8_t  USBD_AUDIO_EP0_RxReady(USBD_HandleTypeDef *pdev)
   switch(haudio->control.cmd)
   {
     case AUDIO_REQ_SET_CUR:
+      USBD_CtlSendStatus(pdev);
       switch (haudio->control.feature_control)
       {
         case AUDIO_CONTROL_MUTE:
