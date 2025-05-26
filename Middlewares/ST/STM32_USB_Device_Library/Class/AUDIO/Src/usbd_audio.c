@@ -233,8 +233,8 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
 
   /* USB Speaker Standard AS Interface Descriptor - Audio Streaming Zero Bandwith */
   /* Interface 1, Alternate Setting 0                                             */
-  AUDIO_INTERFACE_DESC_SIZE,  /* bLength */
-  USB_DESC_TYPE_INTERFACE,        /* bDescriptorType */
+  AUDIO_INTERFACE_DESC_SIZE,            /* bLength */
+  USB_DESC_TYPE_INTERFACE,              /* bDescriptorType */
   0x01,                                 /* bInterfaceNumber */
   0x00,                                 /* bAlternateSetting */
   0x00,                                 /* bNumEndpoints */
@@ -246,8 +246,8 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
 
   /* USB Speaker Standard AS Interface Descriptor - Audio Streaming Operational */
   /* Interface 1, Alternate Setting 1                                           */
-  AUDIO_INTERFACE_DESC_SIZE,  /* bLength */
-  USB_DESC_TYPE_INTERFACE,        /* bDescriptorType */
+  AUDIO_INTERFACE_DESC_SIZE,            /* bLength */
+  USB_DESC_TYPE_INTERFACE,              /* bDescriptorType */
   0x01,                                 /* bInterfaceNumber */
   0x01,                                 /* bAlternateSetting */
   0x01,                                 /* bNumEndpoints */
@@ -299,7 +299,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   0x00,                                 /* wLockDelay */
   0x00,
   /* 07 byte*/
-} ;
+};
 
 /* USB Standard Device Descriptor */
 __ALIGN_BEGIN static uint8_t USBD_AUDIO_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_DESC] __ALIGN_END =
