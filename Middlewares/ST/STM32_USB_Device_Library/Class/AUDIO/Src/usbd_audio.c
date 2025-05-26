@@ -202,7 +202,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   0x01,
   0x00,                                 /* bAssocTerminal */
   0x02,                                 /* bNrChannels */
-  0x00,                                 /* wChannelConfig 0x0000  Mono */
+  0x03,                                 /* wChannelConfig 0x0003  Stereo */
   0x00,
   0x00,                                 /* iChannelNames */
   0x00,                                 /* iTerminal */
@@ -216,8 +216,8 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   0x01,                                 /* bSourceID */
   0x01,                                 /* bControlSize */
   AUDIO_CONTROL_MUTE | AUDIO_CONTROL_VOLUME, /* bmaControls(0) */
-  AUDIO_CONTROL_VOLUME, /* bmaControls(1) */
-  AUDIO_CONTROL_VOLUME, /* bmaControls(2) */
+  AUDIO_CONTROL_VOLUME,                 /* bmaControls(1) */
+  AUDIO_CONTROL_VOLUME,                 /* bmaControls(2) */
   0x00,                                 /* iTerminal */
 
   /*USB Speaker Output Terminal Descriptor */
@@ -295,11 +295,21 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   USB_DESC_TYPE_ENDPOINT,               /* bDescriptorType */
   AUDIO_OUT_EP,                         /* bEndpointAddress 1 out endpoint*/
   USBD_EP_TYPE_ISOC,                    /* bmAttributes */
+  AUDIO_CFG_PACKET,                     /* wMaxPacketSize */
+  0x00,
+  0x05,                                 /* bInterval */
+  0x00,                                 /* bRefresh */
+  0x00,                                 /* bSynchAddress */
+
+  /* Endpoint 2 - Standard AS Isochronous Audio Data Endpoint Descriptor */
+  AUDIO_STANDARD_ENDPOINT_DESC_SIZE,    /* bLength */
+  USB_DESC_TYPE_ENDPOINT,               /* bDescriptorType */
+  AUDIO_OUT_EP2,                        /* bEndpointAddress 2 out endpoint*/
+  USBD_EP_TYPE_ADAPTISOC,               /* bmAttributes */
   AUDIO_PACKET_SZE(USBD_AUDIO_FREQ),    /* wMaxPacketSize in Bytes (Freq(Samples)*2(Stereo)*2(HalfWord)) */
   0x01,                                 /* bInterval */
   0x00,                                 /* bRefresh */
   0x00,                                 /* bSynchAddress */
-  /* 09 byte*/
 };
 
 /* USB Standard Device Descriptor */
@@ -335,8 +345,10 @@ extern USBD_AUDIO_HandleTypeDef haudio;
 static uint8_t  USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 {
   /* Open EP OUT */
-  USBD_LL_OpenEP(pdev, AUDIO_OUT_EP, USBD_EP_TYPE_ISOC, AUDIO_OUT_PACKET);
+  USBD_LL_OpenEP(pdev, AUDIO_OUT_EP, USBD_EP_TYPE_ADAPTISOC, AUDIO_CFG_PACKET);
+  USBD_LL_OpenEP(pdev, AUDIO_OUT_EP2, USBD_EP_TYPE_ISOC, AUDIO_OUT_PACKET);
   pdev->ep_out[AUDIO_OUT_EP & 0xFU].is_used = 1U;
+  pdev->ep_out[AUDIO_OUT_EP2 & 0xFU].is_used = 1U;
 
   /* Allocate Audio structure */
   pdev->pClassData = &haudio;
@@ -360,7 +372,7 @@ static uint8_t  USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
     }
 
     /* Prepare Out endpoint to receive 1st packet */
-    USBD_LL_PrepareReceive(pdev, AUDIO_OUT_EP, &haudio->buffer[haudio->wr_ptr], AUDIO_OUT_PACKET);
+    USBD_LL_PrepareReceive(pdev, AUDIO_OUT_EP2, &haudio->buffer[haudio->wr_ptr], AUDIO_OUT_PACKET);
   }
 
   return USBD_OK;
@@ -378,7 +390,9 @@ static uint8_t  USBD_AUDIO_DeInit(USBD_HandleTypeDef *pdev,
 {
   /* Open EP OUT */
   USBD_LL_CloseEP(pdev, AUDIO_OUT_EP);
+  USBD_LL_CloseEP(pdev, AUDIO_OUT_EP2);
   pdev->ep_out[AUDIO_OUT_EP & 0xFU].is_used = 0U;
+  pdev->ep_out[AUDIO_OUT_EP2 & 0xFU].is_used = 0U;
 
   USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
 
@@ -695,7 +709,7 @@ static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
     }
 
     /* Prepare Out endpoint to receive next audio packet */
-    USBD_LL_PrepareReceive(pdev, AUDIO_OUT_EP, &haudio->buffer[haudio->wr_ptr], AUDIO_OUT_PACKET);
+    USBD_LL_PrepareReceive(pdev, AUDIO_OUT_EP2, &haudio->buffer[haudio->wr_ptr], AUDIO_OUT_PACKET);
   }
 
   return USBD_OK;
