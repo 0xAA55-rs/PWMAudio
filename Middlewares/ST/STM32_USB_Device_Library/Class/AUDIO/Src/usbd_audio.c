@@ -154,6 +154,8 @@ USBD_ClassTypeDef  USBD_AUDIO =
   USBD_AUDIO_GetDeviceQualifierDesc,
 };
 
+#pragma pack(1, push)
+
 /* USB AUDIO device Configuration Descriptor */
 __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
 {
@@ -326,6 +328,8 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIE
   0x01,
   0x00,
 };
+
+#pragma pack(pop)
 
 /**
   * @}
