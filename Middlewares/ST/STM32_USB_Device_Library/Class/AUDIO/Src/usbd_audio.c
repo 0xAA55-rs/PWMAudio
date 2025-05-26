@@ -552,13 +552,13 @@ static uint8_t  USBD_AUDIO_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
 static uint8_t  USBD_AUDIO_EP0_RxReady(USBD_HandleTypeDef *pdev)
 {
   USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
+  USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
 
-  if (haudio->control.cmd == AUDIO_REQ_SET_CUR)
+  if (haudio->control.unit != AUDIO_OUT_STREAMING_CTRL) return USBD_FAIL;
+
+  switch(haudio->control.cmd)
   {
-    USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
-    switch (haudio->control.unit)
-    {
-    case AUDIO_OUT_STREAMING_CTRL:
+    case AUDIO_REQ_SET_CUR:
       switch (haudio->control.feature_control)
       {
         case AUDIO_CONTROL_MUTE:
@@ -568,14 +568,25 @@ static uint8_t  USBD_AUDIO_EP0_RxReady(USBD_HandleTypeDef *pdev)
         default:
           return USBD_FAIL;
       }
-      break;
+      return USBD_OK;
+    case AUDIO_REQ_SET_MIN:
+    case AUDIO_REQ_SET_MAX:
+    case AUDIO_REQ_SET_RES:
+      return USBD_FAIL;
+    case AUDIO_REQ_GET_CUR:
+      AUDIO_REQ_GetCur(pdev, &pdev->request);
+      return USBD_OK;
+    case AUDIO_REQ_GET_MIN:
+      AUDIO_REQ_GetMin(pdev, &pdev->request);
+      return USBD_OK;
+    case AUDIO_REQ_GET_MAX:
+      AUDIO_REQ_GetMax(pdev, &pdev->request);
+      return USBD_OK;
+    case AUDIO_REQ_GET_RES:
+      AUDIO_REQ_GetRes(pdev, &pdev->request);
+      return USBD_OK;
     default:
       return USBD_FAIL;
-    }
-  }
-  else
-  {
-	return USBD_FAIL;
   }
 }
 /**
