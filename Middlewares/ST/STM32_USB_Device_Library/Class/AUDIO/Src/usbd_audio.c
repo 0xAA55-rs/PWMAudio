@@ -540,9 +540,7 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
 static uint8_t  *USBD_AUDIO_GetCfgDesc(uint16_t *length)
 {
   *length = sizeof(USBD_AUDIO_CfgDesc);
-
   *(uint16_t*)&USBD_AUDIO_CfgDesc[2] = sizeof(USBD_AUDIO_CfgDesc);
-
   return USBD_AUDIO_CfgDesc;
 }
 
