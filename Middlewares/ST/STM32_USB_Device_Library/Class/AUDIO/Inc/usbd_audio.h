@@ -51,6 +51,7 @@ extern "C" {
 #endif /* USBD_AUDIO_FREQ */
 
 #define AUDIO_OUT_EP                                  0x01U
+#define AUDIO_OUT_EP2                                 0x01U
 #define AUDIO_INTERFACE_DESC_SIZE                     0x09U
 #define USB_AUDIO_DESC_SIZ                            0x09U
 #define AUDIO_STANDARD_ENDPOINT_DESC_SIZE             0x09U
@@ -99,6 +100,7 @@ extern "C" {
 #define AUDIO_OUT_STREAMING_CTRL                      0x02U
 
 #define AUDIO_OUT_PACKET                              (uint16_t)(((USBD_AUDIO_FREQ * 2U * 2U) / 1000U))
+#define AUDIO_CFG_PACKET                              48U
 #define AUDIO_DEFAULT_VOLUME                          max_volume
 
 /* Number of sub-packets in the audio transfer buffer. You can modify this value but always make sure
