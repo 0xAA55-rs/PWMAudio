@@ -101,10 +101,13 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
       S16_L = 0;
       S16_R = 0;
     }
-    S16_L = S16_L * volume_all / max_volume;
-    S16_R = S16_R * volume_all / max_volume;
-    S16_L = S16_L * volume_l / max_volume;
-    S16_R = S16_R * volume_r / max_volume;
+    else
+    {
+      S16_L = S16_L * volume_all / max_volume;
+      S16_R = S16_R * volume_all / max_volume;
+      S16_L = S16_L * volume_l / max_volume;
+      S16_R = S16_R * volume_r / max_volume;
+    }
     uint16_t U16_L = (uint16_t)S16_L + 32768;
     uint16_t U16_R = (uint16_t)S16_R + 32768;
     uint16_t PWM_L = U16_L * 1500 / 65535;
