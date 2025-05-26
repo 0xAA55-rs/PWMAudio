@@ -346,8 +346,8 @@ static uint8_t  USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
   }
   else
   {
-	USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
-	USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
+    USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
+    USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
     haudio->alt_setting = 0U;
     haudio->offset = AUDIO_OFFSET_NONE;
     haudio->wr_ptr = 0U;
@@ -695,10 +695,7 @@ static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
   */
 static void AUDIO_REQ_GetCur(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
-  USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
   USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
-
-  memset(haudio->control.data, 0, 64U);
 
   uint8_t command = HIBYTE(req->wValue);
   uint8_t channel = LOBYTE(req->wValue);
