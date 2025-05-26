@@ -413,11 +413,23 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
       switch (req->bRequest)
       {
         case AUDIO_REQ_GET_CUR:
-          AUDIO_REQ_GetCurrent(pdev, req);
+          AUDIO_REQ_GetCur(pdev, req);
+          break;
+
+        case AUDIO_REQ_GET_MIN:
+          AUDIO_REQ_GetMin(pdev, req);
+          break;
+
+        case AUDIO_REQ_GET_MAX:
+          AUDIO_REQ_GetMax(pdev, req);
+          break;
+
+        case AUDIO_REQ_GET_RES:
+          AUDIO_REQ_GetRes(pdev, req);
           break;
 
         case AUDIO_REQ_SET_CUR:
-          AUDIO_REQ_SetCurrent(pdev, req);
+          AUDIO_REQ_SetCur(pdev, req);
           break;
 
         default:
