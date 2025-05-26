@@ -380,10 +380,12 @@ static uint8_t  USBD_AUDIO_DeInit(USBD_HandleTypeDef *pdev,
   USBD_LL_CloseEP(pdev, AUDIO_OUT_EP);
   pdev->ep_out[AUDIO_OUT_EP & 0xFU].is_used = 0U;
 
+  USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
+
   /* DeInit  physical Interface components */
   if (pdev->pClassData != NULL)
   {
-    ((USBD_AUDIO_ItfTypeDef *)pdev->pUserData)->DeInit(0U);
+    userdata->DeInit(0U);
     pdev->pClassData = NULL;
   }
 
