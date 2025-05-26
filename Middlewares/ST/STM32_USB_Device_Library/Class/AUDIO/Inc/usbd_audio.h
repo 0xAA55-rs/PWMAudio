@@ -98,7 +98,6 @@ extern "C" {
 
 #define AUDIO_OUT_STREAMING_CTRL                      0x02U
 
-
 #define AUDIO_OUT_PACKET                              (uint16_t)(((USBD_AUDIO_FREQ * 2U * 2U) / 1000U))
 #define AUDIO_DEFAULT_VOLUME                          100
 
@@ -153,7 +152,6 @@ typedef struct
 {
   uint32_t                  alt_setting;
   uint8_t                   buffer[AUDIO_TOTAL_BUF_SIZE];
-  int                       started;
   AUDIO_OffsetTypeDef       offset;
   uint16_t                  wr_ptr;
   USBD_AUDIO_ControlTypeDef control;

@@ -616,11 +616,13 @@ void  USBD_AUDIO_Sync(USBD_HandleTypeDef *pdev, AUDIO_OffsetTypeDef offset)
   {
   case AUDIO_OFFSET_HALF:
 	  userdata->AudioCmd(0, AUDIO_CMD_PLAY);
-	break;
+	  break;
   case AUDIO_OFFSET_FULL:
+    userdata->AudioCmd(AUDIO_HALF_BUF_SIZE, AUDIO_CMD_PLAY);
+    break;
   case AUDIO_OFFSET_NONE:
-	  userdata->AudioCmd(AUDIO_HALF_BUF_SIZE, AUDIO_CMD_PLAY);
-	break;
+    userdata->AudioCmd(0, AUDIO_CMD_START);
+	  break;
   }
 }
 
@@ -656,27 +658,25 @@ static uint8_t  USBD_AUDIO_IsoOutIncomplete(USBD_HandleTypeDef *pdev, uint8_t ep
 static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
   USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
-  USBD_AUDIO_ItfTypeDef *userdata = pdev->pUserData;
 
   if (epnum == AUDIO_OUT_EP)
   {
     haudio->wr_ptr += AUDIO_OUT_PACKET;
     if (haudio->wr_ptr == AUDIO_HALF_BUF_SIZE)
     {
-      USBD_AUDIO_Sync(pdev, AUDIO_OFFSET_HALF);
+      if (haudio->offset != AUDIO_OFFSET_NONE)
+      {
+        haudio->offset = AUDIO_OFFSET_HALF;
+        USBD_AUDIO_Sync(pdev, haudio->offset);
+      }
     }
     else if (haudio->wr_ptr == AUDIO_TOTAL_BUF_SIZE)
     {
-      if (!haudio->started)
-      {
-        userdata->AudioCmd(0, AUDIO_CMD_START);
-        haudio->started = 1;
-      }
+      if (haudio->offset == AUDIO_OFFSET_NONE)
+        USBD_AUDIO_Sync(pdev, haudio->offset);
       else
-      {
         USBD_AUDIO_Sync(pdev, AUDIO_OFFSET_FULL);
-      }
-      haudio->offset = AUDIO_OFFSET_NONE;
+      haudio->offset = AUDIO_OFFSET_FULL;
       haudio->wr_ptr = 0U;
     }
 
