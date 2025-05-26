@@ -159,9 +159,9 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
   /* USER CODE BEGIN 0 */
   if (AudioFreq != 48000) return USBD_FAIL;
   memset(&haudio.buffer, 0, sizeof haudio.buffer);
-  volume_all = Volume;
-  volume_l = 100;
-  volume_r = 100;
+  volume_all = 100;
+  volume_l = Volume;
+  volume_r = Volume;
   is_muted_all = 0;
   is_muted_l = 0;
   is_muted_r = 0;
@@ -222,9 +222,8 @@ static int8_t AUDIO_VolumeCtl_FS(uint8_t channel, uint8_t vol)
   /* USER CODE BEGIN 3 */
   switch (channel)
   {
-  case 0: volume_all = vol; return USBD_OK;
-  case 1: volume_l = vol; return USBD_OK;
-  case 2: volume_r = vol; return USBD_OK;
+  case 0: volume_l = vol; return USBD_OK;
+  case 1: volume_r = vol; return USBD_OK;
   default: return USBD_FAIL;
   }
   /* USER CODE END 3 */
@@ -241,9 +240,8 @@ static int8_t AUDIO_MuteCtl_FS(uint8_t channel, uint8_t cmd)
   /* USER CODE BEGIN 4 */
   switch (channel)
   {
-  case 0: is_muted_all = cmd; return USBD_OK;
-  case 1: is_muted_l = cmd; return USBD_OK;
-  case 2: is_muted_r = cmd; return USBD_OK;
+  case 0: is_muted_l = cmd; return USBD_OK;
+  case 1: is_muted_r = cmd; return USBD_OK;
   default: return USBD_FAIL;
   }
   /* USER CODE END 4 */
@@ -260,12 +258,9 @@ static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol)
   switch(channel)
   {
   case 0:
-    *vol = volume_all;
-    return USBD_OK;
-  case 1:
     *vol = volume_l;
     return USBD_OK;
-  case 2:
+  case 1:
     *vol = volume_r;
     return USBD_OK;
   default:
@@ -284,12 +279,9 @@ static int8_t AUDIO_MuteGet_FS(uint8_t channel, uint8_t *mute)
   switch(channel)
   {
   case 0:
-    *mute = is_muted_all;
-    return USBD_OK;
-  case 1:
     *mute = is_muted_l;
     return USBD_OK;
-  case 2:
+  case 1:
     *mute = is_muted_r;
     return USBD_OK;
   default:
