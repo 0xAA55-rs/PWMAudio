@@ -87,7 +87,14 @@ extern "C" {
 #define AUDIO_ENDPOINT_GENERAL                        0x01U
 
 #define AUDIO_REQ_GET_CUR                             0x81U
+#define AUDIO_REQ_GET_MIN                             0x82U
+#define AUDIO_REQ_GET_MAX                             0x83U
+#define AUDIO_REQ_GET_RES                             0x84U
+
 #define AUDIO_REQ_SET_CUR                             0x01U
+#define AUDIO_REQ_SET_MIN                             0x02U
+#define AUDIO_REQ_SET_MAX                             0x03U
+#define AUDIO_REQ_SET_RES                             0x04U
 
 #define AUDIO_OUT_STREAMING_CTRL                      0x02U
 
