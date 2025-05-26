@@ -615,6 +615,8 @@ void              USB_WritePMA(USB_TypeDef const *USBx, uint8_t *pbUsrBuf,
 
 void              USB_ReadPMA(USB_TypeDef const *USBx, uint8_t *pbUsrBuf,
                               uint16_t wPMABufAddr, uint16_t wNBytes);
+
+void USB_ClearPMA(USB_TypeDef const *USBx, uint16_t wPMABufAddr, uint16_t wNBytes);
 #endif /* defined (USB) */
 /**
   * @}

@@ -2807,6 +2807,26 @@ HAL_StatusTypeDef USB_DeActivateRemoteWakeup(USB_TypeDef *USBx)
 }
 
 /**
+  * @brief Fill zeroes to packet memory area (PMA)
+  * @param   USBx USB peripheral instance register address.
+  * @param   wPMABufAddr address into PMA.
+  * @param   wNBytes no. of bytes to be copied.
+  * @retval None
+  */
+void USB_ClearPMA(USB_TypeDef const *USBx, uint16_t wPMABufAddr, uint16_t wNBytes)
+{
+  size_t n = ((size_t)wNBytes + 1U) >> 1;
+  size_t BaseAddr = (size_t)USBx;
+  __IO uint16_t *pdwVal = (__IO uint16_t *)(BaseAddr + 0x400U + ((size_t)wPMABufAddr * PMA_ACCESS));
+
+  for (size_t i = 0; i < n; i++)
+  {
+    *pdwVal = 0;
+    pdwVal += PMA_ACCESS;
+  }
+}
+
+/**
   * @brief Copy a buffer from user memory area to packet memory area (PMA)
   * @param   USBx USB peripheral instance register address.
   * @param   pbUsrBuf pointer to user memory area.
