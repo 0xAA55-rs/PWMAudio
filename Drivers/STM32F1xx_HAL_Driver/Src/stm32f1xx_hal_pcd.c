@@ -3063,12 +3063,12 @@ void PCD_SET_EP_DBUF_ADDR(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wBuf0Addr,
   PCD_SET_EP_DBUF1_ADDR(USBx, bEpNum, wBuf1Addr);
 }
 
-pUReg PCD_GET_EP_DBUF0_ADDR(USB_TypeDef* USBx, uint8_t bEpNum)
+uint16_t PCD_GET_EP_DBUF0_ADDR(USB_TypeDef* USBx, uint8_t bEpNum)
 {
   return PCD_GET_EP_TX_ADDRESS(USBx, bEpNum);
 }
 
-pUReg PCD_GET_EP_DBUF1_ADDR(USB_TypeDef* USBx, uint8_t bEpNum)
+uint16_t PCD_GET_EP_DBUF1_ADDR(USB_TypeDef* USBx, uint8_t bEpNum)
 {
   return PCD_GET_EP_RX_ADDRESS(USBx, bEpNum);
 }

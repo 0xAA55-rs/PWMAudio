@@ -727,8 +727,8 @@ extern void PCD_SET_EP_DBUF_ADDR(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wBu
   * @param  bEpNum Endpoint Number.
   * @retval None
   */
-extern pUReg PCD_GET_EP_DBUF0_ADDR(USB_TypeDef* USBx, uint8_t bEpNum);
-extern pUReg PCD_GET_EP_DBUF1_ADDR(USB_TypeDef* USBx, uint8_t bEpNum);
+extern uint16_t PCD_GET_EP_DBUF0_ADDR(USB_TypeDef* USBx, uint8_t bEpNum);
+extern uint16_t PCD_GET_EP_DBUF1_ADDR(USB_TypeDef* USBx, uint8_t bEpNum);
 
 /**
   * @brief  Gets buffer 0/1 address of a double buffer endpoint.
