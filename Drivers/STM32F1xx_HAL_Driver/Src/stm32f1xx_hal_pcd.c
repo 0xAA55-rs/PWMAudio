@@ -2736,6 +2736,375 @@ static HAL_StatusTypeDef HAL_PCD_EP_DB_Transmit(PCD_HandleTypeDef *hpcd,
 }
 #endif /* (USE_USB_DOUBLE_BUFFER == 1U) */
 
+#undef PCD_GET_ENDPOINT
+pUReg PCD_GET_ENDPOINT(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return &USBx->EP0R + bEpNum * 2U;
+}
+#define PCD_GET_ENDPOINT(USBx, bEpNum) (*PCD_GET_ENDPOINT(USBx, bEpNum))
+
+pUReg PCD_SET_ENDPOINT(USB_TypeDef* USBx, uint8_t bEpNum, UReg wRegValue)
+{
+  pUReg EP = &PCD_GET_ENDPOINT(USBx, bEpNum);
+  *EP = wRegValue;
+  return EP;
+}
+
+uint16_t PCD_GET_EPTYPE(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return (uint16_t)PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EP_T_FIELD;
+}
+
+pUReg PCD_SET_EPTYPE(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wType)
+{
+  pUReg EP = &PCD_GET_ENDPOINT(USBx, bEpNum);
+  *EP = (*EP & USB_EP_T_MASK) | wType | USB_EP_CTR_TX | USB_EP_CTR_RX;
+  return EP;
+}
+
+pUReg PCD_FREE_USER_BUFFER(USB_TypeDef* USBx, uint8_t bEpNum, int bDir)
+{
+  if (bDir) return PCD_RX_DTOG(USBx, bEpNum);
+  else      return PCD_TX_DTOG(USBx, bEpNum);
+}
+
+pUReg PCD_SET_EP_TX_STATUS(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wState)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPTX_DTOGMASK;
+  /* toggle first bit ? */
+  if (USB_EPTX_DTOG1 & wState)
+  {
+    EPVal ^= USB_EPTX_DTOG1;
+  }
+  /* toggle second bit ?  */
+  if (USB_EPTX_DTOG2 & wState)
+  {
+    EPVal ^= USB_EPTX_DTOG2;
+  }
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX | USB_EP_CTR_TX);
+}
+
+pUReg PCD_SET_EP_RX_STATUS(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wState)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPRX_DTOGMASK;
+  /* toggle first bit ? */
+  if (USB_EPRX_DTOG1 & wState)
+  {
+    EPVal ^= USB_EPRX_DTOG1;
+  }
+  /* toggle second bit ? */
+  if (USB_EPRX_DTOG2 & wState)
+  {
+    EPVal ^= USB_EPRX_DTOG2;
+  }
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX | USB_EP_CTR_TX);
+}
+
+pUReg PCD_SET_EP_TXRX_STATUS(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wStaterx, uint16_t wStatetx)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & (USB_EPRX_DTOGMASK | USB_EPTX_STAT);
+  /* toggle first bit ? */
+  if (USB_EPRX_DTOG1 & wStaterx)
+  {
+    EPVal ^= USB_EPRX_DTOG1;
+  }
+  /* toggle second bit ? */
+  if (USB_EPRX_DTOG2 & wStaterx)
+  {
+    EPVal ^= USB_EPRX_DTOG2;
+  }
+  /* toggle first bit ? */
+  if (USB_EPTX_DTOG1 & wStatetx)
+  {
+    EPVal ^= USB_EPTX_DTOG1;
+  }
+  /* toggle second bit ?  */
+  if (USB_EPTX_DTOG2 & wStatetx)
+  {
+    EPVal ^= USB_EPTX_DTOG2;
+  }
+
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX | USB_EP_CTR_TX);
+}
+
+uint16_t PCD_GET_EP_TX_STATUS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return (uint16_t)PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPTX_STAT;
+}
+
+uint16_t PCD_GET_EP_RX_STATUS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return (uint16_t)PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPRX_STAT;
+}
+
+pUReg PCD_SET_EP_TX_VALID(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_SET_EP_TX_STATUS(USBx, bEpNum, USB_EP_TX_VALID);
+}
+
+pUReg PCD_SET_EP_RX_VALID(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_SET_EP_RX_STATUS(USBx, bEpNum, USB_EP_RX_VALID);
+}
+
+int PCD_GET_EP_TX_STALL_STATUS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_GET_EP_TX_STATUS(USBx, bEpNum) == USB_EP_TX_STALL;
+}
+
+int PCD_GET_EP_RX_STALL_STATUS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_GET_EP_RX_STATUS(USBx, bEpNum) == USB_EP_RX_STALL;
+}
+
+pUReg PCD_SET_EP_KIND(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPREG_MASK;
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX | USB_EP_CTR_TX | USB_EP_KIND);
+}
+
+pUReg PCD_CLEAR_EP_KIND(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPKIND_MASK;
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX | USB_EP_CTR_TX);
+}
+
+pUReg PCD_SET_OUT_STATUS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_SET_EP_KIND(USBx, bEpNum);
+}
+
+pUReg PCD_CLEAR_OUT_STATUS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_CLEAR_EP_KIND(USBx, bEpNum);
+}
+
+pUReg PCD_SET_BULK_EP_DBUF(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_SET_EP_KIND(USBx, bEpNum);
+}
+
+pUReg PCD_CLEAR_BULK_EP_DBUF(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_CLEAR_EP_KIND(USBx, bEpNum);
+}
+
+pUReg PCD_CLEAR_RX_EP_CTR(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & (0x7FFFU & USB_EPREG_MASK);
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_TX);
+}
+
+pUReg PCD_CLEAR_TX_EP_CTR(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & (0xFF7FU & USB_EPREG_MASK);
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX);
+}
+
+pUReg PCD_RX_DTOG(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPREG_MASK;
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX | USB_EP_CTR_TX | USB_EP_DTOG_RX);
+}
+
+pUReg PCD_TX_DTOG(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPREG_MASK;
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX | USB_EP_CTR_TX | USB_EP_DTOG_TX);
+}
+
+void PCD_CLEAR_RX_DTOG(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum);
+  if (EPVal & USB_EP_DTOG_RX)
+    PCD_RX_DTOG(USBx, bEpNum);
+}
+
+void PCD_CLEAR_TX_DTOG(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  uint16_t EPVal = PCD_GET_ENDPOINT(USBx, bEpNum);
+  if (EPVal & USB_EP_DTOG_TX)
+    PCD_TX_DTOG((USBx), (bEpNum));
+}
+
+pUReg PCD_SET_EP_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum, uint8_t bAddr)
+{
+  uint16_t EPVal = (PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPREG_MASK) | bAddr;
+  return PCD_SET_ENDPOINT(USBx, bEpNum, EPVal | USB_EP_CTR_RX | USB_EP_CTR_TX);
+}
+
+uint8_t PCD_GET_EP_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EPADDR_FIELD;
+}
+
+pUReg PCD_EP_TX_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return (pUReg)
+  (
+    (size_t)USBx->BTABLE +
+    ((size_t)bEpNum * 8U + 2U) * PMA_ACCESS +
+    (size_t)USBx + 0x400U
+  );
+}
+
+pUReg PCD_EP_RX_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return (pUReg)
+  (
+    (size_t)USBx->BTABLE +
+    ((size_t)bEpNum * 8U + 6U) * PMA_ACCESS +
+    (size_t)USBx + 0x400U
+  );
+}
+
+pUReg PCD_SET_EP_TX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wAddr)
+{
+  pUReg Reg = (pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 8U * PMA_ACCESS);
+  *Reg = ((wAddr) >> 1) << 1;
+  return Reg;
+}
+
+pUReg PCD_SET_EP_RX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wAddr)
+{
+  pUReg Reg = (pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 4U * PMA_ACCESS);
+  *Reg = ((wAddr) >> 1) << 1;
+  return Reg;
+}
+
+uint16_t PCD_GET_EP_TX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return *(pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 8U * PMA_ACCESS);
+}
+uint16_t PCD_GET_EP_RX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return *(pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 4U * PMA_ACCESS);
+}
+
+pUReg PCD_CALC_BLK32(pUReg pdwReg, uint16_t wCount, uint16_t wNBlocks)
+{
+  wNBlocks = wCount >> 5;
+  if (!(wCount & 0x1fU)) wNBlocks --;
+  *pdwReg |= (wNBlocks << 10) | USB_CNTRX_BLSIZE;
+  return pdwReg;
+}
+
+pUReg PCD_CALC_BLK2(pUReg pdwReg, uint16_t wCount, uint16_t wNBlocks)
+{
+  wNBlocks = wCount >> 1;
+  if (wCount & 0x1U) wNBlocks ++;
+  *pdwReg |= wNBlocks << 10;
+  return pdwReg;
+}
+
+pUReg PCD_SET_EP_CNT_RX_REG(pUReg pdwReg, uint16_t wCount)
+{
+  uint32_t wNBlocks;
+  *pdwReg &= 0x3FFU;
+  if (wCount > 62U)
+    return PCD_CALC_BLK32(pdwReg, wCount, wNBlocks);
+  else if (!wCount)
+  {
+    *pdwReg |= USB_CNTRX_BLSIZE;
+    return pdwReg;
+  }
+  else
+  {
+    return PCD_CALC_BLK2(pdwReg, wCount, wNBlocks);
+  }
+}
+
+pUReg PCD_SET_EP_RX_DBUF0_CNT(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wCount)
+{
+  uint32_t wRegBase = (size_t)USBx + (uint32_t)(USBx)->BTABLE;
+  pUReg pdwReg = (pUReg)(wRegBase + 0x400U + ((size_t)bEpNum * 8U + 2U) * PMA_ACCESS);
+  return PCD_SET_EP_CNT_RX_REG(pdwReg, wCount);
+}
+
+pUReg PCD_SET_EP_TX_CNT(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wCount)
+{
+  uint32_t wRegBase = (size_t)USBx + (uint32_t)(USBx)->BTABLE;
+  pUReg pdwReg = (pUReg)(wRegBase + 0x400U + ((size_t)bEpNum * 8U + 2U) * PMA_ACCESS);
+  *pdwReg = wCount;
+  return pdwReg;
+}
+
+pUReg PCD_SET_EP_RX_CNT(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wCount)
+{
+  uint32_t wRegBase = (size_t)USBx + (uint32_t)(USBx)->BTABLE;
+  pUReg pdwReg = (pUReg)(wRegBase + 0x400U + ((size_t)bEpNum * 8U + 6U) * PMA_ACCESS);
+  *pdwReg = wCount;
+  return pdwReg;
+}
+
+uint32_t PCD_GET_EP_TX_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return (uint32_t)(*PCD_EP_TX_CNT(USBx, bEpNum)) & 0x3ffU;
+}
+
+uint32_t PCD_GET_EP_RX_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return (uint32_t)(*PCD_EP_RX_CNT(USBx, bEpNum)) & 0x3ffU;
+}
+
+pUReg PCD_SET_EP_DBUF0_ADDR(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wBuf0Addr)
+{
+  return PCD_SET_EP_TX_ADDRESS(USBx, bEpNum, wBuf0Addr);
+}
+
+pUReg PCD_SET_EP_DBUF1_ADDR(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wBuf1Addr)
+{
+  return PCD_SET_EP_RX_ADDRESS(USBx, bEpNum, wBuf1Addr);
+}
+
+void PCD_SET_EP_DBUF_ADDR(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wBuf0Addr, uint16_t wBuf1Addr)
+{
+  PCD_SET_EP_DBUF0_ADDR(USBx, bEpNum, wBuf0Addr);
+  PCD_SET_EP_DBUF1_ADDR(USBx, bEpNum, wBuf1Addr);
+}
+
+pUReg PCD_GET_EP_DBUF0_ADDR(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_GET_EP_TX_ADDRESS(USBx, bEpNum);
+}
+
+pUReg PCD_GET_EP_DBUF1_ADDR(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_GET_EP_RX_ADDRESS(USBx, bEpNum);
+}
+
+pUReg PCD_SET_EP_DBUF0_CNT(USB_TypeDef* USBx, uint8_t bEpNum, int bDir, uint16_t wCount)
+{
+  if (!bDir)
+    /* OUT endpoint */
+    return PCD_SET_EP_RX_DBUF0_CNT(USBx, bEpNum, wCount);
+  else
+    /* IN endpoint */
+    return PCD_SET_EP_TX_CNT(USBx, bEpNum, wCount);
+}
+
+pUReg PCD_SET_EP_DBUF1_CNT(USB_TypeDef* USBx, uint8_t bEpNum, int bDir, uint16_t wCount)
+{
+  if (!bDir)
+  {
+    /* OUT endpoint */
+    return PCD_SET_EP_RX_CNT(USBx, bEpNum, wCount);
+  }
+  else
+  {
+    /* IN endpoint */
+    pUReg wEPRegVal = (pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + ((size_t)bEpNum * 8U + 6U) * PMA_ACCESS);
+    *wEPRegVal = wCount;
+    return wEPRegVal;
+  }
+}
+
+void PCD_SET_EP_DBUF_CNT(USB_TypeDef* USBx, uint8_t bEpNum, int bDir, uint16_t wCount)
+{
+  PCD_SET_EP_DBUF0_CNT(USBx, bEpNum, bDir, wCount);
+  PCD_SET_EP_DBUF1_CNT(USBx, bEpNum, bDir, wCount);
+}
+
 #endif /* defined (USB) */
 
 /**
