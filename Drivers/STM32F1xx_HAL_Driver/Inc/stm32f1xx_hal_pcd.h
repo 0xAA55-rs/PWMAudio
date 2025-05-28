@@ -750,8 +750,8 @@ extern void PCD_SET_EP_DBUF_CNT(USB_TypeDef* USBx, uint8_t bEpNum, int bDir, uin
   * @param  bEpNum Endpoint Number.
   * @retval None
   */
-#define PCD_GET_EP_DBUF0_CNT(USBx, bEpNum)     (PCD_GET_EP_TX_CNT((USBx), (bEpNum)))
-#define PCD_GET_EP_DBUF1_CNT(USBx, bEpNum)     (PCD_GET_EP_RX_CNT((USBx), (bEpNum)))
+extern uint32_t PCD_GET_EP_DBUF0_CNT(USB_TypeDef* USBx, uint8_t bEpNum);
+extern uint32_t PCD_GET_EP_DBUF1_CNT(USB_TypeDef* USBx, uint8_t bEpNum);
 
 #endif /* defined (USB) */
 

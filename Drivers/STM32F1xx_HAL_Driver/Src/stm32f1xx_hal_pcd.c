@@ -3105,6 +3105,16 @@ void PCD_SET_EP_DBUF_CNT(USB_TypeDef* USBx, uint8_t bEpNum, int bDir, uint16_t w
   PCD_SET_EP_DBUF1_CNT(USBx, bEpNum, bDir, wCount);
 }
 
+uint32_t PCD_GET_EP_DBUF0_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_GET_EP_TX_CNT(USBx, bEpNum);
+}
+
+uint32_t PCD_GET_EP_DBUF1_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
+{
+  return PCD_GET_EP_RX_CNT(USBx, bEpNum);
+}
+
 #endif /* defined (USB) */
 
 /**
