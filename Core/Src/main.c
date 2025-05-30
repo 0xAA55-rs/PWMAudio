@@ -86,7 +86,7 @@ int __io_getchar(void)
 }
 int __io_putchar(int ch)
 {
-  HAL_UART_Transmit(&huart1, &ch, 1, HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, (const uint8_t *)&ch, 1, HAL_MAX_DELAY);
   return 1;
 }
 int _read(int file, char *ptr, int len)
@@ -96,7 +96,7 @@ int _read(int file, char *ptr, int len)
 }
 int _write(int file, char *ptr, int len)
 {
-  HAL_UART_Transmit(&huart1, ptr, len, HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, (const uint8_t *)ptr, len, HAL_MAX_DELAY);
   return len;
 }
 size_t write_to_stdin_buffer(void *data, size_t len)
@@ -108,12 +108,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   if (huart->Instance == USART1)
   {
     write_to_stdin_buffer(&uart_buf, 1);
-    HAL_UART_Receive_IT(&huart1, &uart_buf, 1);
+    HAL_UART_Receive_IT(&huart1, (uint8_t*)&uart_buf, 1);
   }
 }
 void UART_StartReceive()
 {
-  HAL_UART_Receive_IT(&huart1, &uart_buf, 1);
+  HAL_UART_Receive_IT(&huart1, (uint8_t*)&uart_buf, 1);
 }
 void Main_ResetDMAPosition()
 {
@@ -243,7 +243,7 @@ int main(void)
     }
     if (fb.length)
     {
-      char *ptr = fifobuf_map_read(fb, fb.length);
+      char *ptr = fifobuf_map_read(&fb, fb.length);
       _write(0, ptr, fb.length);
     }
     /* USER CODE END WHILE */

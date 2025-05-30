@@ -7,8 +7,11 @@
 
 #include "fifobuf.h"
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_SHIFT_BUFFER 32
+
+#define min(x, y) ((x) < (y) ? (x) : (y))
 
 void fifobuf_init(fifobuf *fb)
 {
@@ -62,7 +65,7 @@ size_t fifobuf_peek(fifobuf *fb, void *buffer, size_t len)
   size_t ret = min(fb->length, len);
   if (!ret) return 0;
 
-  uint8_t *ptr = data;
+  uint8_t *ptr = buffer;
   size_t to_read = ret;
   size_t back_readable = (sizeof fb->buffer) - fb->position;
   size_t front_readable = fb->position;
@@ -115,7 +118,7 @@ int _fifobuf_is_data_contiguous(fifobuf *fb)
   return back_space >= fb->length;
 }
 
-void _fifobuf_shift_data(fifobuf *fb, ssize_t shift)
+void _fifobuf_shift_data(fifobuf *fb, ptrdiff_t shift)
 {
   static const size_t sizeof_buffer = sizeof fb->buffer;
   uint8_t shift_buf[MAX_SHIFT_BUFFER];
@@ -126,7 +129,7 @@ void _fifobuf_shift_data(fifobuf *fb, ssize_t shift)
     {
       if (_fifobuf_is_data_contiguous(fb) && fb->position > 0)
       {
-        ssize_t shiftable = min(-shift, (ssize_t)fb->position);
+        ptrdiff_t shiftable = min(-shift, (ptrdiff_t)fb->position);
         size_t new_position = fb->position - (size_t)shiftable;
         memmove(&fb->buffer[new_position], &fb->buffer[fb->position], fb->length);
         fb->position = new_position;
@@ -188,7 +191,7 @@ void _fifobuf_realign_data(fifobuf *fb)
   else
   {
     if (fb->position < MAX_SHIFT_BUFFER)
-      _fifobuf_shift_data(fb, -(ssize_t)fb->position);
+      _fifobuf_shift_data(fb, -(ptrdiff_t)fb->position);
     else
       _fifobuf_shift_data(fb, (sizeof fb->buffer) - fb->position);
   }
@@ -211,7 +214,7 @@ void *fifobuf_map_read(fifobuf *fb, size_t len)
 
 void *fifobuf_map_write(fifobuf *fb, size_t len)
 {
-  size_t remain = fifobuf_get_remaining_space(&fb);
+  size_t remain = fifobuf_get_remaining_space(fb);
   if (remain < len) return NULL;
 
   size_t tail_writable = (fb->position + fb->length) % sizeof fb->buffer;

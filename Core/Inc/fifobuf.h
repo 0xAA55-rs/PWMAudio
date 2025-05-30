@@ -12,6 +12,7 @@
 #define FIFOBUF_SIZE 512
 #endif
 
+#include <stddef.h>
 #include <inttypes.h>
 
 typedef struct fifobuf_s
