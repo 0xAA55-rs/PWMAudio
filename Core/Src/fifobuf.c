@@ -84,34 +84,6 @@ size_t fifobuf_peek(fifobuf *fb, void *buffer, size_t len)
   return ret;
 }
 
-static void _memswap(void *buf1, void *buf2, size_t len)
-{
-  uint8_t *ptr1 = buf1;
-  uint8_t *ptr2 = buf2;
-  size_t remain = len;
-  if ((size_t)ptr1 & 0x03 == 0 && (size_t)ptr2 & 0x03 == 0)
-  {
-    while (remain >= 4)
-    {
-      uint32_t t = *(uint32_t*)ptr1;
-      *(uint32_t*)ptr1 = *(uint32_t*)ptr2;
-      *(uint32_t*)ptr2 = t;
-      ptr1 += 4;
-      ptr2 += 4;
-      remain -= 4;
-    }
-  }
-  while (remain)
-  {
-    uint8_t t = *ptr1;
-    *ptr1 = *ptr2;
-    *ptr2 = t;
-    ptr1 ++;
-    ptr2 ++;
-    remain --;
-  }
-}
-
 int _fifobuf_is_data_contiguous(fifobuf *fb)
 {
   size_t back_space = (sizeof fb->buffer) - fb->position;
