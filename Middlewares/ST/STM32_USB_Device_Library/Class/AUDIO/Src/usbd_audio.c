@@ -542,7 +542,7 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
   */
 static uint8_t *USBD_AUDIO_GetCfgDesc(uint16_t *length)
 {
-  assert(sizeof(USBD_AUDIO_CfgDesc) == AUDIO_CfgDescLength);
+  static_assert(sizeof(USBD_AUDIO_CfgDesc) == AUDIO_CFGDESC_LENGTH);
   *length = sizeof(USBD_AUDIO_CfgDesc);
   return (uint8_t *)USBD_AUDIO_CfgDesc;
 }
