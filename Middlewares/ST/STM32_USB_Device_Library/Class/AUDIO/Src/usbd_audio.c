@@ -683,6 +683,7 @@ static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
   USBD_AUDIO_HandleTypeDef *haudio = pdev->pClassData;
 
+  printf("DataOut: ep%u\r\n", (unsigned int)epnum);
   if (epnum == AUDIO_OUT_EP)
   {
     USBD_CtlSendStatus(pdev);

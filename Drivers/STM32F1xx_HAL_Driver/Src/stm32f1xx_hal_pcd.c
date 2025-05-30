@@ -2278,7 +2278,7 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
           if (ep->xfer_count != 8)
           {
-            printf("On setup: ep->xfer_count = %u\n", (unsigned int)ep->xfer_count);
+            printf("On setup: ep->xfer_count = %u\r\n", (unsigned int)ep->xfer_count);
             goto after_process_setup;
           }
 

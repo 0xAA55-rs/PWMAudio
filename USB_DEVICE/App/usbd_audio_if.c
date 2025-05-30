@@ -164,6 +164,7 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
   volume_r = max_volume;
   is_muted_all = 0;
   usb_connected = 1;
+  printf("AUDIO_Init_FS\r\n");
   return (USBD_OK);
   /* USER CODE END 0 */
 }
@@ -178,6 +179,7 @@ static int8_t AUDIO_DeInit_FS(uint32_t options)
   /* USER CODE BEGIN 1 */
   is_muted_all = 1;
   usb_connected = 0;
+  printf("AUDIO_DeInit_FS\r\n");
   return (USBD_OK);
   /* USER CODE END 1 */
 }
@@ -220,6 +222,7 @@ static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
 static int8_t AUDIO_VolumeCtl_FS(uint8_t channel, uint8_t vol)
 {
   /* USER CODE BEGIN 3 */
+  printf("AUDIO_VolumeCtl_FS: %u, %u\r\n", (unsigned int)channel, (unsigned int)vol);
   switch (channel)
   {
   case 0: volume_all = vol; return USBD_OK;
@@ -239,6 +242,7 @@ static int8_t AUDIO_VolumeCtl_FS(uint8_t channel, uint8_t vol)
 static int8_t AUDIO_MuteCtl_FS(uint8_t cmd)
 {
   /* USER CODE BEGIN 4 */
+  printf("AUDIO_MuteCtl_FS: %u\r\n", (unsigned int)cmd);
   is_muted_all = cmd;
   return USBD_OK;
   /* USER CODE END 4 */
@@ -256,16 +260,18 @@ static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol)
   {
   case 0:
     *vol = volume_all;
-    return USBD_OK;
+    break;
   case 1:
     *vol = volume_l;
-    return USBD_OK;
+    break;
   case 2:
     *vol = volume_r;
-    return USBD_OK;
+    break;
   default:
     return USBD_FAIL;
   }
+  printf("AUDIO_VolumeGet_FS: %u, %u\r\n", (unsigned int)channel, (unsigned int)*vol);
+  return USBD_OK;
 }
 
 /**
@@ -277,6 +283,7 @@ static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol)
 static int8_t AUDIO_MuteGet_FS(uint8_t *mute)
 {
   *mute = is_muted_all;
+  printf("AUDIO_MuteGet_FS: %u\r\n", (unsigned int)*mute);
   return USBD_OK;
 }
 /**

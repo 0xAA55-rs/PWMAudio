@@ -172,7 +172,6 @@ void OnHalf(DMA_HandleTypeDef *hdma)
     pwm_ch2_buffer,
     BUFFER_SIZE / 2
   );
-  printf("DMA - OnHalf()\n");
 }
 void OnCplt(DMA_HandleTypeDef *hdma)
 {
@@ -183,7 +182,6 @@ void OnCplt(DMA_HandleTypeDef *hdma)
     pwm_ch2_buffer_half,
     BUFFER_SIZE / 2
   );
-  printf("DMA - OnCplt()\n");
 }
 /* USER CODE END 0 */
 
@@ -229,7 +227,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   Main_StartPlayTimer();
-  printf("All periph Initialized.\n");
+  printf("All periph Initialized.\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
