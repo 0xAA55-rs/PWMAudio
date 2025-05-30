@@ -140,8 +140,6 @@ USBD_ClassTypeDef  USBD_AUDIO =
   USBD_AUDIO_GetDeviceQualifierDesc,
 };
 
-#pragma pack(push, 1)
-
 /* USB AUDIO device Configuration Descriptor */
 #define AUDIO_CONFIG_DESC_SIZE                        0x09U
 #define AUDIO_INTERFACE_DESC_SIZE                     0x09U
@@ -331,8 +329,6 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIE
   0x01,
   0x00,
 };
-
-#pragma pack(pop)
 
 /**
   * @}
