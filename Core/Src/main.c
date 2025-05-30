@@ -55,6 +55,7 @@ uint16_t pwm_ch1_buffer[BUFFER_SIZE];
 uint16_t pwm_ch2_buffer[BUFFER_SIZE];
 uint16_t* pwm_ch1_buffer_half = &pwm_ch1_buffer[BUFFER_SIZE / 2];
 uint16_t* pwm_ch2_buffer_half = &pwm_ch2_buffer[BUFFER_SIZE / 2];
+int usb_connected = 0;
 int is_muted_all = 0;
 int volume_all = MAX_VOLUME;
 int volume_l = MAX_VOLUME;
@@ -151,7 +152,7 @@ void OnCplt(DMA_HandleTypeDef *hdma)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  extern int usb_connected;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
