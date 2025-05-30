@@ -308,7 +308,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[AUDIO_CFGDESC_LENGTH] __ALIGN_EN
   AUDIO_STANDARD_ENDPOINT_DESC_SIZE,    /* bLength */
   USB_DESC_TYPE_ENDPOINT,               /* bDescriptorType */
   AUDIO_OUT_EP,                         /* bEndpointAddress 1 out endpoint*/
-  USBD_EP_TYPE_ADAPTISOC,               /* bmAttributes */
+  USBD_EP_TYPE_ISOC,                    /* bmAttributes */
   AUDIO_PACKET_SZE(USBD_AUDIO_FREQ),    /* wMaxPacketSize */
   0x01,                                 /* bInterval */
   0x00,                                 /* bRefresh */
@@ -348,7 +348,7 @@ extern USBD_AUDIO_HandleTypeDef haudio;
 static uint8_t  USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 {
   /* Open EP OUT */
-  USBD_LL_OpenEP(pdev, AUDIO_OUT_EP, USBD_EP_TYPE_ADAPTISOC, AUDIO_OUT_PACKET);
+  USBD_LL_OpenEP(pdev, AUDIO_OUT_EP, USBD_EP_TYPE_ISOC, AUDIO_OUT_PACKET);
   pdev->ep_out[AUDIO_OUT_EP & 0xFU].is_used = 1U;
 
   /* Allocate Audio structure */
