@@ -11,25 +11,12 @@
   *          ===================================================================
   *           This driver manages the Audio Class 1.0 following the "USB Device Class Definition for
   *           Audio Devices V1.0 Mar 18, 98".
-  *           This driver implements the following aspects of the specification:
-  *             - Device descriptor management
-  *             - Configuration descriptor management
-  *             - Standard AC Interface Descriptor management
-  *             - 1 Audio Streaming Interface (with single channel, PCM, Stereo mode)
-  *             - 1 Audio Streaming Endpoint
-  *             - 1 Audio Terminal Input (1 channel)
-  *             - Audio Class-Specific AC Interfaces
-  *             - Audio Class-Specific AS Interfaces
-  *             - AudioControl Requests: only SET_CUR and GET_CUR requests are supported (for Mute)
-  *             - Audio Feature Unit (limited to Mute control)
-  *             - Audio Synchronization type: Asynchronous
-  *             - Single fixed audio sampling rate (configurable in usbd_conf.h file)
   *          The current audio class version supports the following audio features:
   *             - Pulse Coded Modulation (PCM) format
   *             - sampling rate: 48KHz.
   *             - Bit resolution: 16
   *             - Number of channels: 2
-  *             - No volume control
+  *             - Volume control capability
   *             - Mute/Unmute capability
   *             - Asynchronous Endpoints
   *
@@ -109,8 +96,7 @@ EndBSPDependencies */
 static uint8_t USBD_AUDIO_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
 static uint8_t USBD_AUDIO_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
 
-static uint8_t USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
-                                USBD_SetupReqTypedef *req);
+static uint8_t USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
 
 static uint8_t *USBD_AUDIO_GetCfgDesc(uint16_t *length);
 static uint8_t *USBD_AUDIO_GetDeviceQualifierDesc(uint16_t *length);
@@ -157,13 +143,36 @@ USBD_ClassTypeDef  USBD_AUDIO =
 #pragma pack(push, 1)
 
 /* USB AUDIO device Configuration Descriptor */
-__ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
+#define AUDIO_CONFIG_DESC_SIZE                        0x09U
+#define AUDIO_INTERFACE_DESC_SIZE                     0x09U
+#define AUDIO_STANDARD_ENDPOINT_DESC_SIZE             0x09U
+#define AUDIO_STREAMING_ENDPOINT_DESC_SIZE            0x07U
+#define AUDIO_OUTPUT_TERMINAL_DESC_SIZE               0x09U
+#define AUDIO_FEATURE_UNIT_DESC_SIZE                  0x0AU
+#define AUDIO_TYPE_I_FORMAT_INTERFACE_DESC_SIZE       0x0BU
+#define AUDIO_CFGDESC_LENGTH \
+  AUDIO_CONFIG_DESC_SIZE + \
+  AUDIO_INTERFACE_DESC_SIZE + \
+  AUDIO_INTERFACE_DESC_SIZE + \
+  AUDIO_INPUT_TERMINAL_DESC_SIZE + \
+  AUDIO_FEATURE_UNIT_DESC_SIZE + \
+  AUDIO_OUTPUT_TERMINAL_DESC_SIZE + \
+  AUDIO_INTERFACE_DESC_SIZE + \
+  AUDIO_INTERFACE_DESC_SIZE + \
+  AUDIO_STREAMING_INTERFACE_DESC_SIZE + \
+  AUDIO_TYPE_I_FORMAT_INTERFACE_DESC_SIZE + \
+  AUDIO_STREAMING_ENDPOINT_DESC_SIZE + \
+  AUDIO_STANDARD_ENDPOINT_DESC_SIZE + \
+  AUDIO_STANDARD_ENDPOINT_DESC_SIZE
+
+static const size_t AUDIO_CfgDescLength = AUDIO_CFGDESC_LENGTH;
+__ALIGN_BEGIN static const uint8_t USBD_AUDIO_CfgDesc[AUDIO_CFGDESC_LENGTH] __ALIGN_END =
 {
   /* Configuration 1 */
-  0x09,                                 /* bLength */
+  AUDIO_CONFIG_DESC_SIZE,               /* bLength */
   USB_DESC_TYPE_CONFIGURATION,          /* bDescriptorType */
-  0, /* wTotalLength */
-  0,
+  AUDIO_CfgDescLength & 0xFF,           /* wTotalLength */
+  AUDIO_CfgDescLength >> 8,
   0x02,                                 /* bNumInterfaces */
   0x01,                                 /* bConfigurationValue */
   0x00,                                 /* iConfiguration */
@@ -189,7 +198,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   AUDIO_CONTROL_HEADER,                 /* bDescriptorSubtype */
   0x00,          /* 1.00 */             /* bcdADC */
   0x01,
-  (AUDIO_INPUT_TERMINAL_DESC_SIZE + 0x0A + 0x09 + AUDIO_INTERFACE_DESC_SIZE), /* wTotalLength */
+  (AUDIO_INPUT_TERMINAL_DESC_SIZE + AUDIO_FEATURE_UNIT_DESC_SIZE + AUDIO_OUTPUT_TERMINAL_DESC_SIZE + AUDIO_INTERFACE_DESC_SIZE), /* wTotalLength */
   0x00,
   0x01,                                 /* bInCollection */
   0x01,                                 /* baInterfaceNr */
@@ -211,7 +220,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   /* 12 byte*/
 
   /* USB Speaker Audio Feature Unit Descriptor */
-  0x0A,                                 /* bLength */
+  AUDIO_FEATURE_UNIT_DESC_SIZE,         /* bLength */
   AUDIO_INTERFACE_DESCRIPTOR_TYPE,      /* bDescriptorType */
   AUDIO_CONTROL_FEATURE_UNIT,           /* bDescriptorSubtype */
   AUDIO_OUT_STREAMING_CTRL,             /* bUnitID */
@@ -223,7 +232,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   0x00,                                 /* iTerminal */
 
   /*USB Speaker Output Terminal Descriptor */
-  0x09,      /* bLength */
+  AUDIO_OUTPUT_TERMINAL_DESC_SIZE,      /* bLength */
   AUDIO_INTERFACE_DESCRIPTOR_TYPE,      /* bDescriptorType */
   AUDIO_CONTROL_OUTPUT_TERMINAL,        /* bDescriptorSubtype */
   0x03,                                 /* bTerminalID */
@@ -271,7 +280,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[] __ALIGN_END =
   /* 07 byte*/
 
   /* USB Speaker Audio Type I Format Interface Descriptor */
-  0x0B,                                 /* bLength */
+  AUDIO_TYPE_I_FORMAT_INTERFACE_DESC_SIZE, /* bLength */
   AUDIO_INTERFACE_DESCRIPTOR_TYPE,      /* bDescriptorType */
   AUDIO_STREAMING_FORMAT_TYPE,          /* bDescriptorSubtype */
   AUDIO_FORMAT_TYPE_I,                  /* bFormatType */
@@ -478,8 +487,8 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
         case USB_REQ_GET_DESCRIPTOR:
           if ((req->wValue >> 8) == AUDIO_DESCRIPTOR_TYPE)
           {
-            pbuf = USBD_AUDIO_CfgDesc + 18;
-            len = MIN(USB_AUDIO_DESC_SIZ, req->wLength);
+            pbuf = (uint8_t*)USBD_AUDIO_CfgDesc + AUDIO_CONFIG_DESC_SIZE + AUDIO_INTERFACE_DESC_SIZE;
+            len = MIN(AUDIO_INTERFACE_DESC_SIZE, req->wLength);
 
             USBD_CtlSendData(pdev, pbuf, len);
           }
@@ -541,11 +550,11 @@ static uint8_t  USBD_AUDIO_Setup(USBD_HandleTypeDef *pdev,
   * @param  length : pointer data length
   * @retval pointer to descriptor buffer
   */
-static uint8_t  *USBD_AUDIO_GetCfgDesc(uint16_t *length)
+static uint8_t *USBD_AUDIO_GetCfgDesc(uint16_t *length)
 {
+  assert(sizeof(USBD_AUDIO_CfgDesc) == AUDIO_CfgDescLength);
   *length = sizeof(USBD_AUDIO_CfgDesc);
-  *(uint16_t*)&USBD_AUDIO_CfgDesc[2] = sizeof(USBD_AUDIO_CfgDesc);
-  return USBD_AUDIO_CfgDesc;
+  return (uint8_t *)USBD_AUDIO_CfgDesc;
 }
 
 /**
