@@ -95,6 +95,7 @@ extern uint16_t pwm_ch2_buffer[BUFFER_SIZE];
 extern uint16_t* pwm_ch1_buffer_half;
 extern uint16_t* pwm_ch2_buffer_half;
 extern USBD_AUDIO_HandleTypeDef haudio;
+extern int usb_connected;
 extern int volume_all;
 extern int volume_l;
 extern int volume_r;

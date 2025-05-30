@@ -163,6 +163,7 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
   volume_l = max_volume;
   volume_r = max_volume;
   is_muted_all = 0;
+  usb_connected = 1;
   return (USBD_OK);
   /* USER CODE END 0 */
 }
@@ -176,6 +177,7 @@ static int8_t AUDIO_DeInit_FS(uint32_t options)
 {
   /* USER CODE BEGIN 1 */
   is_muted_all = 1;
+  usb_connected = 0;
   return (USBD_OK);
   /* USER CODE END 1 */
 }
