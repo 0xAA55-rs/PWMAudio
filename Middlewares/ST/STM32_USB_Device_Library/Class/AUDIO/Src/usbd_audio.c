@@ -792,7 +792,7 @@ static void AUDIO_REQ_GetMax(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req
     USBD_CtlSendData(pdev, &data, 1);
     break;
   case AUDIO_CONTROL_VOLUME:
-    data = 100;
+    data = max_volume;
     USBD_CtlSendData(pdev, &data, 1);
     break;
   default:
