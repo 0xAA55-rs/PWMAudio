@@ -25,8 +25,8 @@ void fifobuf_init(fifobuf *fb);
 size_t fifobuf_write(fifobuf *fb, void *data, size_t len);
 size_t fifobuf_read(fifobuf *fb, void *buffer, size_t len);
 size_t fifobuf_peek(fifobuf *fb, void *buffer, size_t len);
-void *fifobuf_map_read(fifobuf *fb, size_t len, size_t *remaining_space);
-void *fifobuf_map_write(fifobuf *fb, size_t len, size_t *remaining_space);
+void *fifobuf_map_read(fifobuf *fb, size_t len);
+void *fifobuf_map_write(fifobuf *fb, size_t len);
 size_t fifobuf_get_remaining_space(fifobuf *fb);
 void fifobuf_clear(fifobuf *fb);
 
