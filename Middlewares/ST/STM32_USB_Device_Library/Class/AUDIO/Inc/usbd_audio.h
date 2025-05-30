@@ -51,7 +51,6 @@ extern "C" {
 #endif /* USBD_AUDIO_FREQ */
 
 #define AUDIO_OUT_EP                                  0x01U
-#define AUDIO_OUT_EP2                                 0x01U
 
 #define AUDIO_DESCRIPTOR_TYPE                         0x21U
 #define USB_DEVICE_CLASS_AUDIO                        0x01U
