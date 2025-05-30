@@ -3151,6 +3151,8 @@ uint32_t PCD_GET_EP_DBUF1_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
   return PCD_GET_EP_RX_CNT(USBx, bEpNum);
 }
 
+// 经测试，已成功战胜宏孩儿。
+
 #endif /* defined (USB) */
 
 /**
