@@ -248,7 +248,10 @@ void _fifobuf_realign_data(fifobuf *fb)
   }
   else
   {
-    _fifobuf_shift_data(fb, -(ssize_t)fb->position);
+    if (fb->position < MAX_SHIFT_BUFFER)
+      _fifobuf_shift_data(fb, -(ssize_t)fb->position);
+    else
+      _fifobuf_shift_data(fb, (sizeof fb->buffer) - fb->position);
   }
 }
 
