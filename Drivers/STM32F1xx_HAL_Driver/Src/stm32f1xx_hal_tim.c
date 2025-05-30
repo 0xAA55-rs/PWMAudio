@@ -1494,7 +1494,7 @@ HAL_StatusTypeDef HAL_TIM_PWM_Start(TIM_HandleTypeDef *htim, uint32_t Channel)
   return HAL_OK;
 }
 
-/**·
+/**
   * @brief  Stops the PWM signal generation.
   * @param  htim TIM PWM handle
   * @param  Channel TIM Channels to be disabled
