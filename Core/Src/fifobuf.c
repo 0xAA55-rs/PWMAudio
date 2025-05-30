@@ -117,7 +117,8 @@ int _fifobuf_is_data_contiguous(fifobuf *fb)
 
 void _fifobuf_shift_data(fifobuf *fb, ssize_t shift)
 {
-  uint8_t buf[MAX_SHIFT_BUFFER];
+  static const size_t sizeof_buffer = sizeof fb->buffer;
+  uint8_t shift_buf[MAX_SHIFT_BUFFER];
   if (shift == 0) return;
   if (shift < 0)
   {
@@ -136,19 +137,104 @@ void _fifobuf_shift_data(fifobuf *fb, ssize_t shift)
         _fifobuf_shift_data(fb, -MAX_SHIFT_BUFFER);
         shift += MAX_SHIFT_BUFFER;
       }
-      else
+      else if (shift < 0)
       {
         size_t to_shift = (size_t)-shift;
-
+        if (fb->length + MAX_SHIFT_BUFFER >= sizeof_buffer)
+        {
+          memcpy(shift_buf, &fb->buffer[0], to_shift);
+          memmove(&fb->buffer[0], &fb->buffer[to_shift], sizeof_buffer - to_shift);
+          memcpy(&fb->buffer[sizeof_buffer - to_shift], shift_buf, to_shift);
+          fb->position = (fb->position + sizeof_buffer - to_shift) % sizeof_buffer;
+        }
+        else
+        {
+          size_t back_data = min(fb->length, sizeof_buffer - fb->position);
+          size_t front_data = fb->length - back_data;
+          size_t buf_usage = min(to_shift, front_data);
+          if (buf_usage)
+          {
+            memcpy(shift_buf, &fb->buffer[0], buf_usage);
+            if (front_data > to_shift)
+              memmove(&fb->buffer[0], &fb->buffer[to_shift], front_data - to_shift);
+          }
+          if (fb->position >= to_shift)
+          {
+            memmove(&fb->buffer[fb->position - to_shift], &fb->buffer[fb->position], back_data);
+            fb->position -= to_shift;
+          }
+          else
+          {
+            size_t head_data = to_shift - fb->position;
+            memcpy(&shift_buf[fb->position], &fb->buffer[fb->position], head_data);
+            buf_usage = to_shift;
+            memmove(&fb->buffer[0], &fb->buffer[to_shift], back_data);
+            fb->position = (fb->position + sizeof_buffer - to_shift) % sizeof_buffer;
+          }
+          if (buf_usage)
+            memcpy(&fb->buffer[fb->position + fb->length - buf_usage], shift_buf, buf_usage);
+        }
+        break;
       }
     }
   }
   else
   {
-    while (shift > MAX_SHIFT_BUFFER)
+    while (shift > 0)
     {
-      _fifobuf_shift_data(fb, MAX_SHIFT_BUFFER);
-      shift -= MAX_SHIFT_BUFFER;
+      size_t back_space = sizeof_buffer - (fb->position + fb->length);
+      if (_fifobuf_is_data_contiguous(fb) && back_space > 0)
+      {
+        size_t shiftable = min((size_t)shift, back_space);
+        size_t new_position = fb->position + shiftable;
+        memmove(&fb->buffer[new_position], &fb->buffer[fb->position], fb->length);
+        fb->position = new_position;
+        shift -= shiftable;
+      }
+      if (shift > MAX_SHIFT_BUFFER)
+      {
+        _fifobuf_shift_data(fb, MAX_SHIFT_BUFFER);
+        shift -= MAX_SHIFT_BUFFER;
+      }
+      else if (shift > 0)
+      {
+        if (fb->length + MAX_SHIFT_BUFFER >= sizeof_buffer)
+        {
+          memcpy(shift_buf, &fb->buffer[sizeof_buffer - shift], shift);
+          memmove(&fb->buffer[shift], &fb->buffer[0],sizeof_buffer - shift);
+          memcpy(&fb->buffer[0], shift_buf, shift);
+          fb->position = (fb->position + shift) % sizeof_buffer;
+        }
+        else
+        {
+          size_t back_data = min(fb->length, sizeof_buffer - fb->position);
+          size_t front_data = fb->length - back_data;
+          size_t buf_usage = min(shift, back_data);
+          if (buf_usage)
+          {
+            memcpy(&shift_buf[MAX_SHIFT_BUFFER - buf_usage], &fb->buffer[sizeof_buffer - buf_usage], buf_usage);
+            if (back_data > shift)
+              memmove(&fb->buffer[fb->position + shift], &fb->buffer[fb->position], back_data - shift);
+          }
+          size_t tail = sizeof_buffer - front_data;
+          if (tail >= shift)
+          {
+            memmove(&fb->buffer[shift], &fb->buffer[0], front_data);
+            fb->position += shift;
+          }
+          else
+          {
+            size_t tail_data = shift - tail;
+            memcpy(shift_buf, &fb->buffer[sizeof_buffer - shift], tail_data);
+            buf_usage = max(buf_usage, tail_data);
+            memmove(&fb->buffer[shift], &fb->buffer[0], front_data - tail_data);
+            fb->position = (fb->position + shift) % sizeof_buffer;
+          }
+          if (buf_usage)
+            memcpy(&fb->buffer[0], shift_buf, buf_usage);
+        }
+        break;
+      }
     }
   }
 }
