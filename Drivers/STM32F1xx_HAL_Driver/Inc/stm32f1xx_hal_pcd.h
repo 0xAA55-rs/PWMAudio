@@ -675,8 +675,8 @@ extern uint16_t PCD_GET_EP_RX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum);
   * @param  wNBlocks no. of Blocks.
   * @retval None
   */
-extern pUReg PCD_CALC_BLK32(pUReg pdwReg, uint16_t wCount, uint16_t wNBlocks);
-extern pUReg PCD_CALC_BLK2(pUReg pdwReg, uint16_t wCount, uint16_t wNBlocks);
+extern pUReg PCD_CALC_BLK32(pUReg pdwReg, uint16_t wCount, uint32_t *wNBlocks);
+extern pUReg PCD_CALC_BLK2(pUReg pdwReg, uint16_t wCount, uint32_t *wNBlocks);
 
 extern pUReg PCD_SET_EP_CNT_RX_REG(pUReg pdwReg, uint16_t wCount);
 extern pUReg PCD_SET_EP_RX_DBUF0_CNT(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wCount);

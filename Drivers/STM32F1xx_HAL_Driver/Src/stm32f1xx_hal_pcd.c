@@ -2981,36 +2981,36 @@ uint16_t PCD_GET_EP_RX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum)
   return *(pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 4U * PMA_ACCESS);
 }
 
-pUReg PCD_CALC_BLK32(pUReg pdwReg, uint16_t wCount, uint16_t wNBlocks)
+pUReg PCD_CALC_BLK32(pUReg Reg, uint16_t wCount, uint32_t *wNBlocks)
 {
-  wNBlocks = wCount >> 5;
-  if (!(wCount & 0x1fU)) wNBlocks --;
-  *pdwReg |= (wNBlocks << 10) | USB_CNTRX_BLSIZE;
-  return pdwReg;
+  *wNBlocks = wCount >> 5;
+  if (!(wCount & 0x1fU)) (*wNBlocks) --;
+  *Reg |= ((*wNBlocks) << 10) | USB_CNTRX_BLSIZE;
+  return Reg;
 }
 
-pUReg PCD_CALC_BLK2(pUReg pdwReg, uint16_t wCount, uint16_t wNBlocks)
+pUReg PCD_CALC_BLK2(pUReg Reg, uint16_t wCount, uint32_t *wNBlocks)
 {
-  wNBlocks = wCount >> 1;
-  if (wCount & 0x1U) wNBlocks ++;
-  *pdwReg |= wNBlocks << 10;
-  return pdwReg;
+  *wNBlocks = wCount >> 1;
+  if (wCount & 0x1U) (*wNBlocks) ++;
+  *Reg |= (*wNBlocks) << 10;
+  return Reg;
 }
 
-pUReg PCD_SET_EP_CNT_RX_REG(pUReg pdwReg, uint16_t wCount)
+pUReg PCD_SET_EP_CNT_RX_REG(pUReg Reg, uint16_t wCount)
 {
-  uint32_t wNBlocks;
-  *pdwReg &= 0x3FFU;
+  uint32_t wNBlocks = 0;
+  *Reg &= 0x3FFU;
   if (wCount > 62U)
-    return PCD_CALC_BLK32(pdwReg, wCount, wNBlocks);
+    return PCD_CALC_BLK32(Reg, wCount, &wNBlocks);
   else if (!wCount)
   {
-    *pdwReg |= USB_CNTRX_BLSIZE;
-    return pdwReg;
+    *Reg |= USB_CNTRX_BLSIZE;
+    return Reg;
   }
   else
   {
-    return PCD_CALC_BLK2(pdwReg, wCount, wNBlocks);
+    return PCD_CALC_BLK2(Reg, wCount, &wNBlocks);
   }
 }
 
