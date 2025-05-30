@@ -2752,14 +2752,13 @@ pUReg PCD_SET_ENDPOINT(USB_TypeDef* USBx, uint8_t bEpNum, UReg wRegValue)
 
 uint16_t PCD_GET_EPTYPE(USB_TypeDef* USBx, uint8_t bEpNum)
 {
-  return (uint16_t)PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EP_T_FIELD;
+  return PCD_GET_ENDPOINT(USBx, bEpNum) & USB_EP_T_FIELD;
 }
 
 pUReg PCD_SET_EPTYPE(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wType)
 {
-  pUReg EP = &PCD_GET_ENDPOINT(USBx, bEpNum);
-  *EP = (*EP & USB_EP_T_MASK) | wType | USB_EP_CTR_TX | USB_EP_CTR_RX;
-  return EP;
+  UReg EP = PCD_GET_ENDPOINT(USBx, bEpNum);
+  return PCD_SET_ENDPOINT(USBx, bEpNum, (EP & USB_EP_T_MASK) | wType | USB_EP_CTR_TX | USB_EP_CTR_RX);
 }
 
 pUReg PCD_FREE_USER_BUFFER(USB_TypeDef* USBx, uint8_t bEpNum, int bDir)
@@ -2960,25 +2959,45 @@ pUReg PCD_EP_RX_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
 
 pUReg PCD_SET_EP_TX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wAddr)
 {
-  pUReg Reg = (pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 8U * PMA_ACCESS);
+  pUReg Reg = (pUReg)
+  (
+    (size_t)USBx->BTABLE +
+    (size_t)USBx + 0x400U +
+    ((size_t)bEpNum * 8U + 0U) * PMA_ACCESS
+  );
   *Reg = ((wAddr) >> 1) << 1;
   return Reg;
 }
 
 pUReg PCD_SET_EP_RX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wAddr)
 {
-  pUReg Reg = (pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 4U * PMA_ACCESS);
+  pUReg Reg = (pUReg)
+  (
+    (size_t)USBx->BTABLE +
+    (size_t)USBx + 0x400U +
+    ((size_t)bEpNum * 8U + 4U) * PMA_ACCESS
+  );
   *Reg = ((wAddr) >> 1) << 1;
   return Reg;
 }
 
 uint16_t PCD_GET_EP_TX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum)
 {
-  return *(pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 8U * PMA_ACCESS);
+  return *(pUReg)
+  (
+    (size_t)USBx->BTABLE +
+    (size_t)USBx + 0x400U +
+    ((size_t)bEpNum * 8U + 0U) * PMA_ACCESS
+  );
 }
 uint16_t PCD_GET_EP_RX_ADDRESS(USB_TypeDef* USBx, uint8_t bEpNum)
 {
-  return *(pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + (size_t)bEpNum * 4U * PMA_ACCESS);
+  return *(pUReg)
+  (
+    (size_t)USBx->BTABLE +
+    (size_t)USBx + 0x400U +
+    ((size_t)bEpNum * 8U + 4U) * PMA_ACCESS
+  );
 }
 
 pUReg PCD_CALC_BLK32(pUReg Reg, uint16_t wCount, uint32_t *wNBlocks)
@@ -3016,25 +3035,37 @@ pUReg PCD_SET_EP_CNT_RX_REG(pUReg Reg, uint16_t wCount)
 
 pUReg PCD_SET_EP_RX_DBUF0_CNT(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wCount)
 {
-  uint32_t wRegBase = (size_t)USBx + (uint32_t)(USBx)->BTABLE;
-  pUReg pdwReg = (pUReg)(wRegBase + 0x400U + ((size_t)bEpNum * 8U + 2U) * PMA_ACCESS);
-  return PCD_SET_EP_CNT_RX_REG(pdwReg, wCount);
+  pUReg Reg = (pUReg)
+  (
+    (size_t)USBx + 0x400U +
+    (size_t)USBx->BTABLE +
+    ((size_t)bEpNum * 8U + 2U) * PMA_ACCESS
+  );
+  return PCD_SET_EP_CNT_RX_REG(Reg, wCount);
 }
 
 pUReg PCD_SET_EP_TX_CNT(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wCount)
 {
-  uint32_t wRegBase = (size_t)USBx + (uint32_t)(USBx)->BTABLE;
-  pUReg pdwReg = (pUReg)(wRegBase + 0x400U + ((size_t)bEpNum * 8U + 2U) * PMA_ACCESS);
-  *pdwReg = wCount;
-  return pdwReg;
+  pUReg Reg = (pUReg)
+  (
+    (size_t)USBx + 0x400U +
+    (size_t)USBx->BTABLE +
+    ((size_t)bEpNum * 8U + 2U) * PMA_ACCESS
+  );
+  *Reg = wCount;
+  return Reg;
 }
 
 pUReg PCD_SET_EP_RX_CNT(USB_TypeDef* USBx, uint8_t bEpNum, uint16_t wCount)
 {
-  uint32_t wRegBase = (size_t)USBx + (uint32_t)(USBx)->BTABLE;
-  pUReg pdwReg = (pUReg)(wRegBase + 0x400U + ((size_t)bEpNum * 8U + 6U) * PMA_ACCESS);
-  *pdwReg = wCount;
-  return pdwReg;
+  pUReg Reg = (pUReg)
+  (
+    (size_t)USBx + 0x400U +
+    (size_t)USBx->BTABLE +
+    ((size_t)bEpNum * 8U + 6U) * PMA_ACCESS
+  );
+  *Reg = wCount;
+  return Reg;
 }
 
 uint32_t PCD_GET_EP_TX_CNT(USB_TypeDef* USBx, uint8_t bEpNum)
@@ -3093,9 +3124,14 @@ pUReg PCD_SET_EP_DBUF1_CNT(USB_TypeDef* USBx, uint8_t bEpNum, int bDir, uint16_t
   else
   {
     /* IN endpoint */
-    pUReg wEPRegVal = (pUReg)((size_t)USBx + (size_t)USBx->BTABLE + 0x400U + ((size_t)bEpNum * 8U + 6U) * PMA_ACCESS);
-    *wEPRegVal = wCount;
-    return wEPRegVal;
+    pUReg EPReg = (pUReg)
+    (
+      (size_t)USBx + 0x400U +
+      (size_t)USBx->BTABLE +
+      ((size_t)bEpNum * 8U + 6U) * PMA_ACCESS
+    );
+    *EPReg = wCount;
+    return EPReg;
   }
 }
 
