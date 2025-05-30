@@ -151,7 +151,7 @@ void OnCplt(DMA_HandleTypeDef *hdma)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  extern int usb_connected;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -191,10 +191,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-  if (HAL_GetTick() % 1000 > 500)
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-  else
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+    if (!usb_connected)
+    {
+      if (HAL_GetTick() % 1000 > 500)
+        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+      else
+        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
