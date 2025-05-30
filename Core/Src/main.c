@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "usbd_audio.h"
 #include "usbd_audio_if.h"
+#include "fifobuf.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,6 +61,7 @@ int volume_all = MAX_VOLUME;
 int volume_l = MAX_VOLUME;
 int volume_r = MAX_VOLUME;
 const int max_volume = MAX_VOLUME;
+fifobuf fb;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -74,15 +76,31 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int __io_getchar(void)
+{
+  int ret = 0;
+  size_t read = fifobuf_read(&fb, &ret, 1);
+  if (!read) ret = EOF;
+  return ret;
+}
 int __io_putchar(int ch)
 {
   HAL_UART_Transmit(&huart1, &ch, 1, HAL_MAX_DELAY);
   return 1;
 }
+int _read(int file, char *ptr, int len)
+{
+  (void)file;
+  return (int)fifobuf_read(&fb, ptr, len);
+}
 int _write(int file, char *ptr, int len)
 {
   HAL_UART_Transmit(&huart1, ptr, len, HAL_MAX_DELAY);
   return len;
+}
+size_t write_to_stdin_buffer(void *data, size_t len)
+{
+  return fifobuf_write(&fb, data, len);
 }
 void Main_ResetDMAPosition()
 {
