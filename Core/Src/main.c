@@ -62,6 +62,7 @@ int volume_l = MAX_VOLUME;
 int volume_r = MAX_VOLUME;
 const int max_volume = MAX_VOLUME;
 fifobuf fb;
+uint32_t uart_buf = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,6 +102,18 @@ int _write(int file, char *ptr, int len)
 size_t write_to_stdin_buffer(void *data, size_t len)
 {
   return fifobuf_write(&fb, data, len);
+}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART1)
+  {
+    write_to_stdin_buffer(&uart_buf, 1);
+    HAL_UART_Receive_IT(&huart1, &uart_buf, 1);
+  }
+}
+void UART_StartReceive()
+{
+  HAL_UART_Receive_IT(&huart1, &uart_buf, 1);
 }
 void Main_ResetDMAPosition()
 {
@@ -207,6 +220,7 @@ int main(void)
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  UART_StartReceive();
   memset(pwm_ch1_buffer, 0, sizeof pwm_ch1_buffer);
   memset(pwm_ch2_buffer, 0, sizeof pwm_ch2_buffer);
   HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_CPLT_CB_ID, OnCplt);
@@ -228,6 +242,11 @@ int main(void)
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
       else
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+    }
+    if (fb.length)
+    {
+      char *ptr = fifobuf_map_read(fb, fb.length);
+      _write(0, ptr, fb.length);
     }
     /* USER CODE END WHILE */
 
