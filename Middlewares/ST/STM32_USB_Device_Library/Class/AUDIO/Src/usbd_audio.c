@@ -171,7 +171,7 @@ USBD_ClassTypeDef  USBD_AUDIO =
   AUDIO_INTERFACE_DESC_SIZE
 
 static const size_t AUDIO_CfgDescLength = AUDIO_CFGDESC_LENGTH;
-__ALIGN_BEGIN uint8_t USBD_AUDIO_CfgDesc[AUDIO_CFGDESC_LENGTH] __ALIGN_END =
+__ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[AUDIO_CFGDESC_LENGTH] __ALIGN_END =
 {
   /* Configuration 1 */
   AUDIO_CONFIG_DESC_SIZE,               /* bLength */
