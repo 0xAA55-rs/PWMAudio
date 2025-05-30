@@ -248,7 +248,7 @@ void _fifobuf_realign_data(fifobuf *fb)
   }
   else
   {
-
+    _fifobuf_shift_data(fb, -(ssize_t)fb->position);
   }
 }
 
