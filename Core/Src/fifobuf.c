@@ -254,28 +254,31 @@ void _fifobuf_realign_data(fifobuf *fb)
 
 void *fifobuf_map_read(fifobuf *fb, size_t len)
 {
-  size_t remain = fifobuf_get_remaining_space(&fb);
-  if (remain < len) return NULL;
+  if (fb->length < len) return NULL;
 
   size_t back_readable = (sizeof fb->buffer) - fb->position;
 
-  if (back_readable >= len)
-  {
-    void *ret = &fb->buffer[fb->position];
-    fb->position += len;
-    if (fb->position == sizeof fb->buffer) fb->position = 0;
-    fb->length -= len;
-    return ret;
-  }
-  else
-  {
-
-  }
+  if (back_readable < len)
+    _fifobuf_realign_data(fb);
+  void *ret = &fb->buffer[fb->position];
+  fb->position += len;
+  if (fb->position == sizeof fb->buffer) fb->position = 0;
+  fb->length -= len;
+  return ret;
 }
 
 void *fifobuf_map_write(fifobuf *fb, size_t len)
 {
+  size_t remain = fifobuf_get_remaining_space(&fb);
+  if (remain < len) return NULL;
 
+  size_t tail_writable = (fb->position + fb->length) % sizeof fb->buffer;
+
+  if (tail_writable < len)
+    _fifobuf_realign_data(fb);
+  void *ret = &fb->buffer[fb->position + fb->length];
+  fb->length += len;
+  return ret;
 }
 
 size_t fifobuf_get_remaining_space(fifobuf *fb)
