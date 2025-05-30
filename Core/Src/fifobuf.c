@@ -53,6 +53,7 @@ size_t fifobuf_read(fifobuf *fb, void *buffer, size_t len)
   fb->position += read;
   if (fb->position >= sizeof fb->buffer) fb->position -= sizeof fb->buffer;
   fb->length -= read;
+  if (!fb->length) fb->position = 0;
   return read;
 }
 
