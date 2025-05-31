@@ -2278,9 +2278,10 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
           if (ep->xfer_count != 8)
           {
-            HAL_PCD_EP_Flush(hpcd, 0x00);
-            HAL_PCD_EP_Flush(hpcd, 0x80);
+            USB_EPSetStall(hpcd->Instance, ep);
+            hpcd->Instance->BTABLE = 0;
             PCD_CLEAR_RX_EP_CTR(hpcd->Instance, PCD_ENDP0);
+            USB_EPClearStall(hpcd->Instance, ep);
             HAL_PCD_EP_Receive(hpcd, 0x00, ptr, 8);
             printf("On setup: ep->xfer_count = %u\r\n", (unsigned int)ep->xfer_count);
             goto after_process_setup;
