@@ -216,7 +216,7 @@ static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
 
 /**
   * @brief  Controls AUDIO Volume.
-  * @param  channel: audio channel, 0=left, 1=right
+  * @param  channel: audio channel, 0=master, 1=left, 2=right
   * @param  vol: volume level (0..100)
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
@@ -236,7 +236,6 @@ static int8_t AUDIO_VolumeCtl_FS(uint8_t channel, uint8_t vol)
 
 /**
   * @brief  Controls AUDIO Mute.
-  * @param  channel: audio channel, 0=left, 1=right
   * @param  cmd: command opcode
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
@@ -251,7 +250,7 @@ static int8_t AUDIO_MuteCtl_FS(uint8_t cmd)
 
 /**
   * @brief  Controls AUDIO Volume
-  * @param  channel: audio channel, 0=left, 1=right
+  * @param  channel: audio channel, 0=master, 1=left, 2=right
   * @param  vol: pointer to output the volume level (0..100)
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
@@ -277,7 +276,6 @@ static int8_t AUDIO_VolumeGet_FS(uint8_t channel, uint8_t *vol)
 
 /**
   * @brief  Controls AUDIO Mute.
-  * @param  channel: audio channel, 0=left, 1=right
   * @param  mute: pointer to output the state of muted or not
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
