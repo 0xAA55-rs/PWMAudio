@@ -201,14 +201,14 @@ static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
       ConvertS16LEStereoToPWM(haudio.buffer, pwm_ch1_buffer, pwm_ch2_buffer, BUFFER_SIZE);
       Main_ResetDMAPosition();
       Main_StartPlayTimer();
-      printf("AUDIO_AudioCmd_FS %u START\r\n", (unsigned int)offset);
+      printf("AUDIO_AudioCmd_FS START\r\n");
       break;
 
     case AUDIO_CMD_PLAY:
       break;
 
     case AUDIO_CMD_STOP:
-      printf("AUDIO_AudioCmd_FS %u STOP\r\n", (unsigned int)offset);
+      printf("AUDIO_AudioCmd_FS STOP\r\n");
       break;
   }
   return (USBD_OK);
