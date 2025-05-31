@@ -2299,13 +2299,14 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
 
           /* Get Control Data OUT Packet */
           ep->xfer_count = PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
+          size_t max_xfer_count = PCD_MIN(ep->xfer_count, ep->maxpacket);
 
-          if ((ep->xfer_count != 0U) && (ep->xfer_buff != 0U))
+          if ((max_xfer_count != 0U) && (ep->xfer_buff != 0U))
           {
             USB_ReadPMA(hpcd->Instance, ep->xfer_buff,
-                        ep->pmaadress, (uint16_t)ep->xfer_count);
+                        ep->pmaadress, (uint16_t)max_xfer_count);
 
-            ep->xfer_buff += ep->xfer_count;
+            ep->xfer_buff += max_xfer_count;
 
             /* Process Control Data OUT Packet */
 #if (USE_HAL_PCD_REGISTER_CALLBACKS == 1U)
@@ -2341,6 +2342,7 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
         if (ep->doublebuffer == 0U)
         {
           count = (uint16_t)PCD_GET_EP_RX_CNT(hpcd->Instance, ep->num);
+          count = PCD_MIN(count, ep->maxpacket);
 
           if (count != 0U)
           {
@@ -2354,6 +2356,7 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
           if (ep->type == EP_TYPE_BULK)
           {
             count = HAL_PCD_EP_DB_Receive(hpcd, ep, wEPVal);
+            count = PCD_MIN(count, ep->maxpacket);
           }
           else /* manage double buffer iso out */
           {
@@ -2364,6 +2367,7 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
             {
               /* read from endpoint BUF0Addr buffer */
               count = (uint16_t)PCD_GET_EP_DBUF0_CNT(hpcd->Instance, ep->num);
+              count = PCD_MIN(count, ep->maxpacket);
 
               if (count != 0U)
               {
@@ -2374,6 +2378,7 @@ static HAL_StatusTypeDef PCD_EP_ISR_Handler(PCD_HandleTypeDef *hpcd)
             {
               /* read from endpoint BUF1Addr buffer */
               count = (uint16_t)PCD_GET_EP_DBUF1_CNT(hpcd->Instance, ep->num);
+              count = PCD_MIN(count, ep->maxpacket);
 
               if (count != 0U)
               {
