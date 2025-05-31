@@ -687,7 +687,6 @@ static uint8_t  USBD_AUDIO_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
   {
     USBD_CtlSendStatus(pdev);
     haudio->wr_ptr += AUDIO_OUT_PACKET;
-    printf("DataOut: ep%u %u\r\n", (unsigned int)epnum, (unsigned int)haudio->wr_ptr * 100 / AUDIO_TOTAL_BUF_SIZE);
     if (haudio->wr_ptr == AUDIO_HALF_BUF_SIZE)
     {
       if (haudio->offset != AUDIO_OFFSET_NONE)
