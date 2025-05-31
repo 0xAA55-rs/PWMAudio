@@ -194,7 +194,6 @@ static int8_t AUDIO_DeInit_FS(uint32_t options)
 static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
 {
   /* USER CODE BEGIN 2 */
-  printf("AUDIO_AudioCmd_FS %u %u\r\n", (unsigned int)offset, (unsigned int)cmd);
   switch(cmd)
   {
     case AUDIO_CMD_START:
@@ -202,13 +201,15 @@ static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
       ConvertS16LEStereoToPWM(haudio.buffer, pwm_ch1_buffer, pwm_ch2_buffer, BUFFER_SIZE);
       Main_ResetDMAPosition();
       Main_StartPlayTimer();
-    break;
+      printf("AUDIO_AudioCmd_FS %u START\r\n", (unsigned int)offset);
+      break;
 
     case AUDIO_CMD_PLAY:
-    break;
+      break;
 
     case AUDIO_CMD_STOP:
-    break;
+      printf("AUDIO_AudioCmd_FS %u STOP\r\n", (unsigned int)offset);
+      break;
   }
   return (USBD_OK);
   /* USER CODE END 2 */
