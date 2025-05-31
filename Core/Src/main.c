@@ -164,7 +164,7 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
     S16LEInterleaved[i * 2 + 1] = 0;
   }
 }
-void OnHalf(DMA_HandleTypeDef *hdma)
+void MainDMAOnHalf(DMA_HandleTypeDef *hdma)
 {
   ConvertS16LEStereoToPWM
   (
@@ -174,7 +174,7 @@ void OnHalf(DMA_HandleTypeDef *hdma)
     BUFFER_SIZE / 2
   );
 }
-void OnCplt(DMA_HandleTypeDef *hdma)
+void MainDMAOnCplt(DMA_HandleTypeDef *hdma)
 {
   ConvertS16LEStereoToPWM
   (
@@ -222,8 +222,8 @@ int main(void)
   UART_StartReceive();
   memset(pwm_ch1_buffer, 0, sizeof pwm_ch1_buffer);
   memset(pwm_ch2_buffer, 0, sizeof pwm_ch2_buffer);
-  HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_CPLT_CB_ID, OnCplt);
-  HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_HALFCPLT_CB_ID, OnHalf);
+  HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_CPLT_CB_ID, MainDMAOnCplt);
+  HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_HALFCPLT_CB_ID, MainDMAOnHalf);
   __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1 | TIM_DMA_CC2);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
