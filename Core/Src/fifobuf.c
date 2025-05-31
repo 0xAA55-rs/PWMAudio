@@ -25,25 +25,23 @@ size_t fifobuf_write(fifobuf *fb, void *data, size_t len)
 
   uint8_t *ptr = data;
   size_t back_writable = (sizeof fb->buffer) - fb->position;
-  size_t front_writable = fb->position;
   size_t to_write = ret;
   size_t back_write = min(back_writable, ret);
-  if (!back_write)
-  {
-    back_write = min(front_writable, ret);
-    fb->position = 0;
-  }
+  size_t write_pos;
 
-  memcpy(&fb->buffer[fb->position], ptr, back_write);
-  fb->position += back_write;
-  fb->length += back_write;
-  ptr += back_write;
-  to_write -= back_write;
+  if (back_write)
+  {
+    write_pos = (fb->position + fb->length) % sizeof fb->buffer;
+    memcpy(&fb->buffer[write_pos], ptr, back_write);
+    fb->length += back_write;
+    ptr += back_write;
+    to_write -= back_write;
+  }
 
   if (to_write)
   {
-    memcpy(&fb->buffer[0], ptr, to_write);
-    fb->position = to_write;
+    write_pos = (fb->position + fb->length) % sizeof fb->buffer;
+    memcpy(&fb->buffer[write_pos], ptr, to_write);
     fb->length += to_write;
   }
 
