@@ -157,7 +157,7 @@ void _fifobuf_realign_data(fifobuf *fb)
 {
   if (_fifobuf_is_data_contiguous(fb))
   {
-    memmove(fb->buffer, &fb->buffer[fb->position], fb->length);
+    memmove(&fb->buffer[0], &fb->buffer[fb->position], fb->length);
     fb->position = 0;
   }
   else
