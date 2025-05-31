@@ -183,7 +183,6 @@ void OnCplt(DMA_HandleTypeDef *hdma)
     pwm_ch2_buffer_half,
     BUFFER_SIZE / 2
   );
-  printf("DMA OnCplt()\r\n");
 }
 /* USER CODE END 0 */
 
