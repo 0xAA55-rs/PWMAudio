@@ -61,7 +61,8 @@ int volume_all = MAX_VOLUME;
 int volume_l = MAX_VOLUME;
 int volume_r = MAX_VOLUME;
 const int max_volume = MAX_VOLUME;
-fifobuf fb;
+fifobuf fb_in;
+fifobuf fb_out;
 uint32_t uart_buf = 0;
 /* USER CODE END PV */
 
@@ -80,28 +81,28 @@ static void MX_USART1_UART_Init(void);
 int __io_getchar(void)
 {
   int ret = 0;
-  size_t read = fifobuf_read(&fb, &ret, 1);
+  size_t read = fifobuf_read(&fb_in, &ret, 1);
   if (!read) ret = EOF;
   return ret;
 }
 int __io_putchar(int ch)
 {
-  HAL_UART_Transmit(&huart1, (const uint8_t *)&ch, 1, HAL_MAX_DELAY);
+  fifobuf_write(&fb_out, &ch, 1);
   return 1;
 }
 int _read(int file, char *ptr, int len)
 {
   (void)file;
-  return (int)fifobuf_read(&fb, ptr, len);
+  return (int)fifobuf_read(&fb_in, ptr, len);
 }
 int _write(int file, char *ptr, int len)
 {
-  HAL_UART_Transmit(&huart1, (const uint8_t *)ptr, len, HAL_MAX_DELAY);
-  return len;
+  int written = (int)fifobuf_write(&fb_out, ptr, len);
+  return written;
 }
 size_t write_to_stdin_buffer(void *data, size_t len)
 {
-  return fifobuf_write(&fb, data, len);
+  return fifobuf_write(&fb_in, data, len);
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -182,6 +183,7 @@ void OnCplt(DMA_HandleTypeDef *hdma)
     pwm_ch2_buffer_half,
     BUFFER_SIZE / 2
   );
+  printf("DMA OnCplt()\r\n");
 }
 /* USER CODE END 0 */
 
@@ -242,10 +244,16 @@ int main(void)
       else
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     }
-    if (fb.length)
+    if (fb_in.length)
     {
-      char *ptr = fifobuf_map_read(&fb, fb.length);
-      _write(0, ptr, fb.length);
+      char *ptr = fifobuf_map_read(&fb_in, fb_in.length);
+      _write(0, ptr, fb_in.length);
+    }
+    if (fb_out.length)
+    {
+      size_t len = fb_out.length;
+      const uint8_t *ptr = fifobuf_map_read(&fb_out, len);
+      HAL_UART_Transmit(&huart1, ptr, len, HAL_MAX_DELAY);
     }
     /* USER CODE END WHILE */
 
