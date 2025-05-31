@@ -179,8 +179,11 @@ void *fifobuf_map_read(fifobuf *fb, size_t len)
     _fifobuf_realign_data(fb);
   void *ret = &fb->buffer[fb->position];
   fb->position += len;
-  if (fb->position == sizeof fb->buffer) fb->position = 0;
   fb->length -= len;
+  if (!fb->length)
+    fb->position = 0;
+  else
+    if (fb->position >= sizeof fb->buffer) fb->position -= sizeof fb->buffer;
   return ret;
 }
 
