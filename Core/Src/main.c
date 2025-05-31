@@ -226,6 +226,7 @@ int main(void)
   __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1 | TIM_DMA_CC2);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  Main_ResetDMAPosition();
   Main_StartPlayTimer();
   printf("All periph Initialized.\r\n");
   /* USER CODE END 2 */
