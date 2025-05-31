@@ -194,6 +194,7 @@ static int8_t AUDIO_DeInit_FS(uint32_t options)
 static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
 {
   /* USER CODE BEGIN 2 */
+  printf("AUDIO_AudioCmd_FS %u %u\r\n", (unsigned int)offset, (unsigned int)cmd);
   switch(cmd)
   {
     case AUDIO_CMD_START:
