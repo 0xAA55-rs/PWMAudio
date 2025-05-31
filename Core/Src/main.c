@@ -39,7 +39,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define MAX_VOLUME 1500
+#define MAX_VOLUME 100
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
