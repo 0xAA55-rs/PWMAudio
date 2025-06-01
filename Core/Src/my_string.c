@@ -54,7 +54,7 @@ void *memset(void * dst, int val, size_t len)
   return dst;
 }
 
-void *memcpy(void *__restrict dst, const void *__restrict src, size_t len)
+void *memcpy(void * dst, const void * src, size_t len)
 {
   uint32_t *ptr_dst = dst;
   const uint32_t *ptr_src = src;
