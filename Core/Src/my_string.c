@@ -13,7 +13,19 @@
 void *memset(void * dst, int val, size_t len)
 {
   uint32_t *ptr_dst = dst;
-  if (((size_t)dst & 0x3) == 0)
+  size_t head = (size_t)ptr_dst & 0x3;
+  if (head)
+  {
+    uint8_t *ptr_dst_ = (uint8_t *)ptr_dst;
+    while(head && len)
+    {
+      *ptr_dst_ ++ = (uint8_t) val;
+      head --;
+      len --;
+    }
+    ptr_dst = (uint32_t *)ptr_dst_;
+  }
+  if (len >= 4)
   {
     union {
       uint8_t u8[4];
@@ -30,10 +42,10 @@ void *memset(void * dst, int val, size_t len)
     }
   }
   uint8_t *ptr_dst_ = (uint8_t *)ptr_dst;
-  while (len >= 1)
+  while (len)
   {
     *ptr_dst_ ++ = (uint8_t) val;
-    len -= 1;
+    len --;
   }
   return dst;
 }
@@ -43,21 +55,35 @@ void *memcpy(void *__restrict dst, const void *__restrict src, size_t len)
   uint32_t *ptr_dst = dst;
   const uint32_t *ptr_src = src;
   if (dst == src) return dst;
-  if (((size_t)dst & 0x3) == 0 && ((size_t)src & 0x3) == 0)
+  size_t head = (size_t)dst & 0x3;
+  if (head)
   {
-    while (len >= 4)
+    uint8_t *ptr_dst_ = (uint8_t *)ptr_dst;
+    uint8_t *ptr_src_ = (uint8_t *)ptr_src;
+    while(head && len)
     {
-      *ptr_dst++ = *ptr_src++;
-      len -= 4;
+      *ptr_dst_++ = *ptr_src_++;
+      head --;
+      len --;
     }
+    ptr_dst = (uint32_t *)ptr_dst_;
+    ptr_src = (uint32_t *)ptr_src_;
   }
-  uint8_t *ptr_dst_ = (uint8_t *)ptr_dst;
-  uint8_t *ptr_src_ = (uint8_t *)ptr_src;
-
-  while (len >= 1)
+  while (len >= 4)
   {
-    *ptr_dst_++ = *ptr_src_++;
-    len -= 1;
+    *ptr_dst++ = *ptr_src++;
+    len -= 4;
+  }
+  if (len)
+  {
+    uint8_t *ptr_dst_ = (uint8_t *)ptr_dst;
+    uint8_t *ptr_src_ = (uint8_t *)ptr_src;
+
+    while (len)
+    {
+      *ptr_dst_++ = *ptr_src_++;
+      len --;
+    }
   }
   return dst;
 }
@@ -75,20 +101,34 @@ void *memmove(void * dst, const void * src, size_t len)
   {
     uint32_t *ptr_dst_end = (uint32_t *)((uint8_t*)dst + len);
     uint32_t *ptr_src_end = (uint32_t *)((uint8_t*)src + len);
-    if (((size_t)ptr_dst_end & 0x3) == 0 && ((size_t)ptr_src_end & 0x3) == 0)
+    size_t tail = (size_t)ptr_dst_end & 0x3;
+    if (tail)
     {
-      while (len >= 4)
+      uint8_t *ptr_dst_end_ = (uint8_t *)ptr_dst_end;
+      uint8_t *ptr_src_end_ = (uint8_t *)ptr_src_end;
+      while (tail && len)
       {
-        *--ptr_dst = *--ptr_src;
-        len -= 4;
+        *--ptr_dst_end_ = *--ptr_src_end_;
+        tail --;
+        len --;
       }
+      ptr_dst_end = (uint32_t *)ptr_dst_end_;
+      ptr_src_end = (uint32_t *)ptr_src_end_;
     }
-    uint8_t *ptr_dst_end_ = (uint8_t *)ptr_dst_end;
-    uint8_t *ptr_src_end_ = (uint8_t *)ptr_src_end;
-    while (len >= 1)
+    while (len >= 4)
     {
-      *--ptr_dst_end_ = *--ptr_src_end_;
-      len -= 1;
+      *--ptr_dst_end = *--ptr_src_end;
+      len -= 4;
+    }
+    if (len)
+    {
+      uint8_t *ptr_dst_end_ = (uint8_t *)ptr_dst_end;
+      uint8_t *ptr_src_end_ = (uint8_t *)ptr_src_end;
+      while (len)
+      {
+        *--ptr_dst_end_ = *--ptr_src_end_;
+        len --;
+      }
     }
   }
   return dst;
