@@ -16,6 +16,8 @@ English | [简体中文](Readme-CN.md)
 
 * PA0: PWM output to MOSFET amplifier (Channel 1)
 * PA1: PWM output to MOSFET amplifier (Channel 2)
+* PA9: UART TX for debugging. Your `printf()` use this to output the debug info.
+* PA10: UART RX for debugging. Your `scanf()` use this to read your console input.
 * PA11: USB D- (white wire in standard USB cables)
 * PA12: USB D+ (green wire) with 1.5kΩ pull-up to 3.3V
 * PA13: SWDIO (ST-Link debugger, optional for programming/debugging)*
