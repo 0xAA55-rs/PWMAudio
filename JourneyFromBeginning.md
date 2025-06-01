@@ -4,18 +4,18 @@
 English | [简体中文](JourneyFromBeginning-CN.md)
 
 ## Source Code
-* **GitHub**:  
-  [Main Repo https://github.com/0xAA55/PWMAudio](https://github.com/0xAA55/PWMAudio)  
-  [Alt Repo https://github.com/0xAA55-rs/PWMAudio](https://github.com/0xAA55-rs/PWMAudio)  
-* **Gitee (China Mirror)**:  
-  [https://gitee.com/a5k3rn3l/pwmaudio](https://gitee.com/a5k3rn3l/pwmaudio)  
+* **GitHub**:
+  [Main Repo https://github.com/0xAA55/PWMAudio](https://github.com/0xAA55/PWMAudio)
+  [Alt Repo https://github.com/0xAA55-rs/PWMAudio](https://github.com/0xAA55-rs/PWMAudio)
+* **Gitee (China Mirror)**:
+  [https://gitee.com/a5k3rn3l/pwmaudio](https://gitee.com/a5k3rn3l/pwmaudio)
 * **Note**: All repositories are fully synchronized. Gitee defaults to Chinese `Readme-CN.md`.
 
 ## Development Tools
 ### Software:
 * **STM32CubeMX**: This thing helps you select the chip model, then choose which peripherals and middleware to use, configure chip pins, and finally generates initial code for you to modify. I've already used it to generate the code, you can directly clone my code from the repository.
   * *Note: If you install STM32CubeMX, you can see exactly how I configured various peripherals, the main system clock configuration (USB peripherals must be configured to 48MHz), TIM2 configuration, DMA configuration, and USB configuration.*
-  
+
 * **STM32CubeIDE**: This thing is a code editor + downloader and debugger (requires ST-LINK device). You need to open the `.project` file in my project using this software, wait for it to fully load, and then you can view, edit, modify code, adjust parameters, compile (Debug and Release configurations), download and debug. I've enabled `-flto` optimization in the Release configuration, so the optimization effect should be ideal (may over-optimize, causing the compiler to think your code is useless. You need to use the `volatile` keyword to modify some registers that must be read or stored). For optimization direction, I used `-O3`. The default is `-Os`, mainly afraid the code would be too large and blow up the ROM, but there actually won't be that much code.
 
 * **Audio Player**: We're developing a sound card device. To test this device, we need a player responsible for playing things like music or recordings.
@@ -69,8 +69,8 @@ English | [简体中文](JourneyFromBeginning-CN.md)
 STM32CubeMX-generated USB Audio Class example code all needs your modifications. Focus on modifying the following key code files:
 * `USB_DEVICE\App\usbd_audio_if.c`
 * `USB_DEVICE\App\usbd_audio_if.h`
-* `Middlewares\ST\STM32_USB_Device_Library\Class\AUDIO\Src\usbd_audio.c` 
-* `Middlewares\ST\STM32_USB_Device_Library\Class\AUDIO\Inc\usbd_audio.h` 
+* `Middlewares\ST\STM32_USB_Device_Library\Class\AUDIO\Src\usbd_audio.c`
+* `Middlewares\ST\STM32_USB_Device_Library\Class\AUDIO\Inc\usbd_audio.h`
 
 Additionally, there are many bugs to fix in `Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_pcd.c`.
 
