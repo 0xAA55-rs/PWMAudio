@@ -59,13 +59,6 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /* The 0xAA55 implemented `memset()` `memcpy()` `memmove()` is 4x faster than the libc */
-  .my_memory_funcs :
-  {
-    KEEP(*(.my_memory_funcs))
-    . = ALIGN(4);
-  } >FLASH
-
   /* The program code and other data into "FLASH" Rom type memory */
   .text :
   {

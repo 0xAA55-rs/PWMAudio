@@ -10,7 +10,6 @@
 
 #pragma GCC optimize ("no-tree-loop-distribute-patterns")
 
-__attribute__((section(".my_memory_funcs"), used))
 void *memset(void * dst, int val, size_t len)
 {
   uint32_t *ptr_dst = dst;
@@ -39,7 +38,6 @@ void *memset(void * dst, int val, size_t len)
   return dst;
 }
 
-__attribute__((section(".my_memory_funcs"), used))
 void *memcpy(void *__restrict dst, const void *__restrict src, size_t len)
 {
   uint32_t *ptr_dst = dst;
@@ -64,7 +62,6 @@ void *memcpy(void *__restrict dst, const void *__restrict src, size_t len)
   return dst;
 }
 
-__attribute__((section(".my_memory_funcs"), used))
 void *memmove(void * dst, const void * src, size_t len)
 {
   uint32_t *ptr_dst = dst;
