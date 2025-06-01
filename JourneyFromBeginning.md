@@ -55,6 +55,9 @@ English | [简体中文](JourneyFromBeginning-CN.md)
 
 * Miscellaneous items: Prototype board, jumper wires, wire strippers, nail clippers (very suitable for cutting cables and DuPont pins and other thin, sturdy metal), soldering station, hot air gun, heat shrink tubing, solder, brass sponge, DuPont wires, DuPont pins, connectors, USB connectors, pliers or other clamps (to hold the circuit board while soldering), a bunch of ceramic capacitors you may or may not use, resistors. I don't like electrolytic capacitors—they explode.
 
+***Ventilation Warning***:
+  **Good ventilation environment, or if ventilation is poor but you can skillfully dodge** by moving your head away from the soldering smoke, you won't suffer skin and brain damage from inhaling excessive lead.
+
 ## Development Process
 
 ### Idea
@@ -62,7 +65,7 @@ English | [简体中文](JourneyFromBeginning-CN.md)
 * I use PWM to drive the speakers. I need to convert the audio samples sent from the host to PWM duty cycle arrays on my end, then use DMA in circular mode to continuously write these arrays to the PWM channel's duty cycle registers in the TIM peripheral.
 * Because I need to drive two speakers playing left and right channel audio, I need two PWM channels of TIM. Each PWM channel's duty cycle data must be provided by an independent DMA channel. Therefore, I need two PWM duty cycle arrays as data sources for DMA transfer.
 * Set DMA to run in **"circular mode"** (`DMA_CIRCULAR`). When half transferred, call one of my callback functions; when a whole buffer is transferred, call another callback function of mine. What do my callback functions do? My callback functions are responsible for converting the PCM samples sent by the host into PWM duty cycle on my end. They separate left and right channels, scale the value range from `-32768..32767` to my PWM pulse width range, and store them separately in my two PWM buffers. This way DMA can continuously output PCM-converted PWM duty cycle to the PWM pulse width register of TIM.
-  * Typical double buffering playback mode. While playing one buffer, update the data in the other buffer; when switching to play the other buffer, update the data in the previous buffer, repeating seamlessly for continuous playback.
+  * This is the typical double buffering playback mode. While playing one buffer, update the data in the other buffer; when switching to play the other buffer, update the data in the previous buffer, repeating seamlessly for continuous playback.
 * Theoretically, STM32F103C8T6 runs at 72 MHz. If you want to play 48,000 Hz audio with PWM, the PWM pulse width value range can only be within 1500. This way, the theoretical audio quality is reduced to about 10 to 11 bits depth.
 
 ### My Code Hands-on Process
