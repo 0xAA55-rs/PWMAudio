@@ -8,6 +8,10 @@
 #include "my_string.h"
 #include <inttypes.h>
 
+// https://gcc.gnu.org/onlinedocs/gcc/Function-Specific-Option-Pragmas.html
+// https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-ftree-loop-distribute-patterns
+// https://stackoverflow.com/questions/46996893/gcc-replaces-loops-with-memcpy-and-memset
+
 #pragma GCC optimize ("no-tree-loop-distribute-patterns")
 
 void *memset(void * dst, int val, size_t len)
