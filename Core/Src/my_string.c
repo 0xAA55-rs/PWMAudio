@@ -90,8 +90,6 @@ void *memcpy(void *__restrict dst, const void *__restrict src, size_t len)
 
 void *memmove(void * dst, const void * src, size_t len)
 {
-  uint32_t *ptr_dst = dst;
-  const uint32_t *ptr_src = src;
   if (dst == src) return dst;
   if (dst < src)
   {
