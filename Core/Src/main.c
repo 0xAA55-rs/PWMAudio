@@ -109,7 +109,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   if (huart->Instance == USART1)
   {
     write_to_stdin_buffer(&uart_buf, 1);
-    HAL_UART_Receive_IT(&huart1, (uint8_t*)&uart_buf, 1);
+    HAL_UART_Receive_IT(huart, (uint8_t*)&uart_buf, 1);
   }
 }
 void UART_StartReceive()
