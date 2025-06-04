@@ -15,6 +15,7 @@
 
 void fifobuf_init(fifobuf *fb, size_t capacity)
 {
+  // Not actually set the buffer to zero.
   memset(fb, 0, sizeof *fb);
   fb->capacity = capacity;
 }
@@ -181,7 +182,7 @@ void *fifobuf_map_read(fifobuf *fb, size_t len)
   if (!fb->length)
     fb->position = 0;
   else
-    if (fb->position >= sizeof fb->buffer) fb->position -= fb->capacity;
+    if (fb->position >= fb->capacity) fb->position -= fb->capacity;
   return ret;
 }
 
@@ -201,7 +202,7 @@ void *fifobuf_map_write(fifobuf *fb, size_t len)
 
 size_t fifobuf_get_remaining_space(fifobuf *fb)
 {
-  return (sizeof fb->buffer) - fb->length;
+  return fb->capacity - fb->length;
 }
 
 void fifobuf_clear(fifobuf *fb)
