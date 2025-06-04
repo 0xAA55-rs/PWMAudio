@@ -28,6 +28,6 @@ void *fifobuf_map_write(fifobuf *fb, size_t len);
 size_t fifobuf_get_remaining_space(fifobuf *fb);
 void fifobuf_clear(fifobuf *fb);
 
-#define DEFINE_FIFOBUF(prefix, name, size) union { uint8_t placeholder[size + sizeof(fifobuf)]; fifobuf name; } prefix
+#define DEFINE_FIFOBUF(prefix, name, size) union { fifobuf name; uint8_t _placeholder[size + sizeof(fifobuf)]; } prefix
 
 #endif /* INC_FIFOBUF_H_ */
