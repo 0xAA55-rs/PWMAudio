@@ -13,9 +13,10 @@
 
 #define min(x, y) ((x) < (y) ? (x) : (y))
 
-void fifobuf_init(fifobuf *fb)
+void fifobuf_init(fifobuf *fb, size_t capacity)
 {
   memset(fb, 0, sizeof *fb);
+  fb->capacity = capacity;
 }
 
 size_t fifobuf_write(fifobuf *fb, void *data, size_t len)
@@ -24,14 +25,14 @@ size_t fifobuf_write(fifobuf *fb, void *data, size_t len)
   if (!ret) return 0;
 
   uint8_t *ptr = data;
-  size_t back_writable = (sizeof fb->buffer) - fb->position;
+  size_t back_writable = fb->capacity - fb->position;
   size_t to_write = ret;
   size_t back_write = min(back_writable, ret);
   size_t write_pos;
 
   if (back_write)
   {
-    write_pos = (fb->position + fb->length) % sizeof fb->buffer;
+    write_pos = (fb->position + fb->length) % fb->capacity;
     memcpy(&fb->buffer[write_pos], ptr, back_write);
     fb->length += back_write;
     ptr += back_write;
@@ -40,7 +41,7 @@ size_t fifobuf_write(fifobuf *fb, void *data, size_t len)
 
   if (to_write)
   {
-    write_pos = (fb->position + fb->length) % sizeof fb->buffer;
+    write_pos = (fb->position + fb->length) % fb->capacity;
     memcpy(&fb->buffer[write_pos], ptr, to_write);
     fb->length += to_write;
   }
@@ -52,7 +53,7 @@ size_t fifobuf_read(fifobuf *fb, void *buffer, size_t len)
 {
   size_t read = fifobuf_peek(fb, buffer, len);
   fb->position += read;
-  if (fb->position >= sizeof fb->buffer) fb->position -= sizeof fb->buffer;
+  if (fb->position >= fb->capacity) fb->position -= fb->capacity;
   fb->length -= read;
   if (!fb->length) fb->position = 0;
   return read;
@@ -65,7 +66,7 @@ size_t fifobuf_peek(fifobuf *fb, void *buffer, size_t len)
 
   uint8_t *ptr = buffer;
   size_t to_read = ret;
-  size_t back_readable = (sizeof fb->buffer) - fb->position;
+  size_t back_readable = fb->capacity - fb->position;
   size_t front_readable = fb->position;
   size_t back_read = min(back_readable, ret);
   if (back_read)
@@ -84,13 +85,12 @@ size_t fifobuf_peek(fifobuf *fb, void *buffer, size_t len)
 
 int _fifobuf_is_data_contiguous(fifobuf *fb)
 {
-  size_t back_space = (sizeof fb->buffer) - fb->position;
+  size_t back_space = fb->capacity - fb->position;
   return back_space >= fb->length;
 }
 
 void _fifobuf_shift_data(fifobuf *fb, ptrdiff_t shift)
 {
-  static const size_t sizeof_buffer = sizeof fb->buffer;
   uint8_t shift_buf[MAX_SHIFT_BUFFER];
   if (shift == 0) return;
   if (shift < 0)
@@ -114,9 +114,9 @@ void _fifobuf_shift_data(fifobuf *fb, ptrdiff_t shift)
       {
         size_t to_shift = (size_t)-shift;
         memcpy(shift_buf, &fb->buffer[0], to_shift);
-        memmove(&fb->buffer[0], &fb->buffer[to_shift], sizeof_buffer - to_shift);
-        memcpy(&fb->buffer[sizeof_buffer - to_shift], shift_buf, to_shift);
-        fb->position = (fb->position + sizeof_buffer - to_shift) % sizeof_buffer;
+        memmove(&fb->buffer[0], &fb->buffer[to_shift], fb->capacity - to_shift);
+        memcpy(&fb->buffer[fb->capacity - to_shift], shift_buf, to_shift);
+        fb->position = (fb->position + fb->capacity - to_shift) % fb->capacity;
         break;
       }
     }
@@ -125,7 +125,7 @@ void _fifobuf_shift_data(fifobuf *fb, ptrdiff_t shift)
   {
     while (shift > 0)
     {
-      size_t back_space = sizeof_buffer - (fb->position + fb->length);
+      size_t back_space = fb->capacity - (fb->position + fb->length);
       if (_fifobuf_is_data_contiguous(fb) && back_space > 0)
       {
         size_t shiftable = min((size_t)shift, back_space);
@@ -141,10 +141,10 @@ void _fifobuf_shift_data(fifobuf *fb, ptrdiff_t shift)
       }
       else if (shift > 0)
       {
-        memcpy(shift_buf, &fb->buffer[sizeof_buffer - shift], shift);
-        memmove(&fb->buffer[shift], &fb->buffer[0],sizeof_buffer - shift);
+        memcpy(shift_buf, &fb->buffer[fb->capacity - shift], shift);
+        memmove(&fb->buffer[shift], &fb->buffer[0],fb->capacity - shift);
         memcpy(&fb->buffer[0], shift_buf, shift);
-        fb->position = (fb->position + shift) % sizeof_buffer;
+        fb->position = (fb->position + shift) % fb->capacity;
         break;
       }
     }
@@ -163,7 +163,7 @@ void _fifobuf_realign_data(fifobuf *fb)
     if (fb->position < MAX_SHIFT_BUFFER)
       _fifobuf_shift_data(fb, -(ptrdiff_t)fb->position);
     else
-      _fifobuf_shift_data(fb, (sizeof fb->buffer) - fb->position);
+      _fifobuf_shift_data(fb, fb->capacity - fb->position);
   }
 }
 
@@ -171,7 +171,7 @@ void *fifobuf_map_read(fifobuf *fb, size_t len)
 {
   if (fb->length < len) return NULL;
 
-  size_t back_readable = (sizeof fb->buffer) - fb->position;
+  size_t back_readable = fb->capacity - fb->position;
 
   if (back_readable < len)
     _fifobuf_realign_data(fb);
@@ -181,7 +181,7 @@ void *fifobuf_map_read(fifobuf *fb, size_t len)
   if (!fb->length)
     fb->position = 0;
   else
-    if (fb->position >= sizeof fb->buffer) fb->position -= sizeof fb->buffer;
+    if (fb->position >= sizeof fb->buffer) fb->position -= fb->capacity;
   return ret;
 }
 
@@ -190,7 +190,7 @@ void *fifobuf_map_write(fifobuf *fb, size_t len)
   size_t remain = fifobuf_get_remaining_space(fb);
   if (remain < len) return NULL;
 
-  size_t tail_writable = (fb->position + fb->length) % sizeof fb->buffer;
+  size_t tail_writable = (fb->position + fb->length) % fb->capacity;
 
   if (tail_writable < len)
     _fifobuf_realign_data(fb);

@@ -8,10 +8,6 @@
 #ifndef INC_FIFOBUF_H_
 #define INC_FIFOBUF_H_
 
-#ifndef FIFOBUF_SIZE
-#define FIFOBUF_SIZE 512
-#endif
-
 #include <stddef.h>
 #include <inttypes.h>
 
@@ -19,10 +15,11 @@ typedef struct fifobuf_s
 {
   size_t position;
   size_t length;
-  uint8_t buffer[FIFOBUF_SIZE];
+  size_t capacity;
+  uint8_t buffer[0];
 }fifobuf;
 
-void fifobuf_init(fifobuf *fb);
+void fifobuf_init(fifobuf *fb, size_t capacity);
 size_t fifobuf_write(fifobuf *fb, void *data, size_t len);
 size_t fifobuf_read(fifobuf *fb, void *buffer, size_t len);
 size_t fifobuf_peek(fifobuf *fb, void *buffer, size_t len);
@@ -30,5 +27,7 @@ void *fifobuf_map_read(fifobuf *fb, size_t len);
 void *fifobuf_map_write(fifobuf *fb, size_t len);
 size_t fifobuf_get_remaining_space(fifobuf *fb);
 void fifobuf_clear(fifobuf *fb);
+
+#define DEFINE_FIFOBUF(prefix, name, size) union { uint8_t placeholder[size + sizeof(fifobuf)]; fifobuf name; } prefix
 
 #endif /* INC_FIFOBUF_H_ */

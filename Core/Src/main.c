@@ -61,8 +61,8 @@ int volume_all = MAX_VOLUME;
 int volume_l = MAX_VOLUME;
 int volume_r = MAX_VOLUME;
 const int max_volume = MAX_VOLUME;
-fifobuf fb_in;
-fifobuf fb_out;
+DEFINE_FIFOBUF(stdi, fb, 512);
+DEFINE_FIFOBUF(stdo, fb, 512);
 uint32_t uart_buf = 0;
 /* USER CODE END PV */
 
@@ -81,28 +81,28 @@ static void MX_USART1_UART_Init(void);
 int __io_getchar(void)
 {
   int ret = 0;
-  size_t read = fifobuf_read(&fb_in, &ret, 1);
+  size_t read = fifobuf_read(&stdi.fb, &ret, 1);
   if (!read) ret = EOF;
   return ret;
 }
 int __io_putchar(int ch)
 {
-  fifobuf_write(&fb_out, &ch, 1);
+  fifobuf_write(&stdo.fb, &ch, 1);
   return 1;
 }
 int _read(int file, char *ptr, int len)
 {
   (void)file;
-  return (int)fifobuf_read(&fb_in, ptr, len);
+  return (int)fifobuf_read(&stdi.fb, ptr, len);
 }
 int _write(int file, char *ptr, int len)
 {
-  int written = (int)fifobuf_write(&fb_out, ptr, len);
+  int written = (int)fifobuf_write(&stdo.fb, ptr, len);
   return written;
 }
 size_t write_to_stdin_buffer(void *data, size_t len)
 {
-  return fifobuf_write(&fb_in, data, len);
+  return fifobuf_write(&stdi.fb, data, len);
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -243,15 +243,16 @@ int main(void)
       else
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     }
-    if (fb_in.length)
+    if (stdi.fb.length)
     {
-      char *ptr = fifobuf_map_read(&fb_in, fb_in.length);
-      _write(0, ptr, fb_in.length);
+      size_t len = stdi.fb.length;
+      char *ptr = fifobuf_map_read(&stdi.fb, len);
+      _write(0, ptr, len);
     }
-    if (fb_out.length)
+    if (stdo.fb.length)
     {
-      size_t len = fb_out.length;
-      const uint8_t *ptr = fifobuf_map_read(&fb_out, len);
+      size_t len = stdo.fb.length;
+      const uint8_t *ptr = fifobuf_map_read(&stdo.fb, len);
       HAL_UART_Transmit(&huart1, ptr, len, HAL_MAX_DELAY);
     }
     /* USER CODE END WHILE */
