@@ -13,9 +13,9 @@
 
 typedef struct fifobuf_s
 {
+  size_t capacity;
   size_t position;
   size_t length;
-  size_t capacity;
   uint8_t buffer[0];
 }fifobuf;
 
