@@ -209,7 +209,8 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  fifobuf_init(&stdi.fb, 512);
+  fifobuf_init(&stdo.fb, 512);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
