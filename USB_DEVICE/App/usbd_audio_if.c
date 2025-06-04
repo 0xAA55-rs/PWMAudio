@@ -186,8 +186,7 @@ static int8_t AUDIO_DeInit_FS(uint32_t options)
 
 /**
   * @brief  Handles AUDIO command.
-  * @param  pbuf: Pointer to buffer of data to be sent
-  * @param  size: Number of data to be sent (in bytes)
+  * @param  offset: Offset of data to be played (in bytes)
   * @param  cmd: Command opcode
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
