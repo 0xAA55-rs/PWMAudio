@@ -197,7 +197,7 @@ static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
   {
     case AUDIO_CMD_START:
       Main_StopPlayTimer();
-      ConvertS16LEStereoToPWM(haudio.buffer, pwm_ch1_buffer, pwm_ch2_buffer, BUFFER_SIZE);
+      ConvertS16LEStereoToPWM(haudio.buffer, pwm_ch1_buffer, pwm_ch2_buffer, pwm_ch3_buffer, pwm_ch4_buffer, BUFFER_SIZE);
       Main_ResetDMAPosition();
       Main_StartPlayTimer();
       printf("AUDIO_AudioCmd_FS START\r\n");

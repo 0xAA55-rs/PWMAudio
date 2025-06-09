@@ -158,7 +158,7 @@ void Main_StopPlayTimer()
     HAL_TIM_Base_Stop(&htim3);
   }
 }
-void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count)
+void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L_P, uint16_t *Target_L_M, uint16_t *Target_R_P, uint16_t *Target_R_M, size_t Count)
 {
   int16_t* S16LEInterleaved = (int16_t*)Buffer;
   for (size_t i = 0; i < Count; i++)
@@ -177,12 +177,18 @@ void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Targ
       S16_L = S16_L * volume_l / max_volume;
       S16_R = S16_R * volume_r / max_volume;
     }
-    uint16_t U16_L = (uint16_t)S16_L + 32768;
-    uint16_t U16_R = (uint16_t)S16_R + 32768;
-    uint16_t PWM_L = U16_L * 1500 / 65535;
-    uint16_t PWM_R = U16_R * 1500 / 65535;
-    Target_L[i] = PWM_L;
-    Target_R[i] = PWM_R;
+    uint16_t PWM_L_P = 0;
+    uint16_t PWM_L_M = 0;
+    uint16_t PWM_R_P = 0;
+    uint16_t PWM_R_M = 0;
+    if (S16_L >= 0) PWM_L_P = (uint16_t)(+(int)S16_L * 1500 / 32767);
+    else            PWM_L_M = (uint16_t)(-(int)S16_L * 1499 / 32768);
+    if (S16_R >= 0) PWM_R_P = (uint16_t)(+(int)S16_R * 1500 / 32767);
+    else            PWM_R_M = (uint16_t)(-(int)S16_R * 1499 / 32768);
+    Target_L_P[i] = PWM_L_P;
+    Target_L_M[i] = PWM_L_M;
+    Target_R_P[i] = PWM_R_P;
+    Target_R_M[i] = PWM_R_M;
     S16LEInterleaved[i * 2 + 0] = 0;
     S16LEInterleaved[i * 2 + 1] = 0;
   }
@@ -194,6 +200,8 @@ void MainDMAOnHalf(DMA_HandleTypeDef *hdma)
     &haudio.buffer[0],
     pwm_ch1_buffer,
     pwm_ch2_buffer,
+    pwm_ch3_buffer,
+    pwm_ch4_buffer,
     BUFFER_SIZE / 2
   );
 }
@@ -204,6 +212,8 @@ void MainDMAOnCplt(DMA_HandleTypeDef *hdma)
     &haudio.buffer[AUDIO_HALF_BUF_SIZE],
     pwm_ch1_buffer_half,
     pwm_ch2_buffer_half,
+    pwm_ch3_buffer_half,
+    pwm_ch4_buffer_half,
     BUFFER_SIZE / 2
   );
 }

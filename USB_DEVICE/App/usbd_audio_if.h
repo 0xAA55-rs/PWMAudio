@@ -112,7 +112,7 @@ extern void Main_ResetDMAPosition();
 extern void Main_StartPlayTimer();
 extern void Main_StopPlayTimer();
 extern int Main_IsPlayTimerOn();
-extern void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count);
+extern void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L_P, uint16_t *Target_L_M, uint16_t *Target_R_P, uint16_t *Target_R_M, size_t Count);
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**
