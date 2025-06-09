@@ -130,8 +130,12 @@ void Main_ResetDMAPosition()
 {
   HAL_DMA_Abort_IT(&hdma_tim2_ch1);
   HAL_DMA_Abort(&hdma_tim2_ch2_ch4);
-  HAL_DMA_Start_IT(&hdma_tim2_ch1, (uint32_t)&pwm_ch1_buffer, (uint32_t)&TIM2->CCR1, BUFFER_SIZE);
+  HAL_DMA_Abort(&hdma_tim3_ch3);
+  HAL_DMA_Abort(&hdma_tim3_ch4_up);
+  HAL_DMA_Start_IT(&hdma_tim2_ch1,  (uint32_t)&pwm_ch1_buffer, (uint32_t)&TIM2->CCR1, BUFFER_SIZE);
   HAL_DMA_Start(&hdma_tim2_ch2_ch4, (uint32_t)&pwm_ch2_buffer, (uint32_t)&TIM2->CCR2, BUFFER_SIZE);
+  HAL_DMA_Start(&hdma_tim3_ch3,     (uint32_t)&pwm_ch3_buffer, (uint32_t)&TIM3->CCR3, BUFFER_SIZE);
+  HAL_DMA_Start(&hdma_tim3_ch4_up,  (uint32_t)&pwm_ch4_buffer, (uint32_t)&TIM3->CCR4, BUFFER_SIZE);
 }
 int Main_IsPlayTimerOn()
 {
@@ -239,8 +243,11 @@ int main(void)
   HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_CPLT_CB_ID, MainDMAOnCplt);
   HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_HALFCPLT_CB_ID, MainDMAOnHalf);
   __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1 | TIM_DMA_CC2);
+  __HAL_TIM_ENABLE_DMA(&htim3, TIM_DMA_CC3 | TIM_DMA_CC4);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
   Main_ResetDMAPosition();
   Main_StartPlayTimer();
   printf("All periph Initialized.\r\n");
