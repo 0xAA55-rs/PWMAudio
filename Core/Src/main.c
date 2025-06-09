@@ -139,15 +139,24 @@ void Main_ResetDMAPosition()
 }
 int Main_IsPlayTimerOn()
 {
-  return htim2.Instance->CR1 & TIM_CR1_CEN ? 1 : 0;
+  return
+    (htim2.Instance->CR1 & TIM_CR1_CEN ? 1 : 0) ||
+    (htim3.Instance->CR1 & TIM_CR1_CEN ? 1 : 0);
 }
 void Main_StartPlayTimer()
 {
-  if (!Main_IsPlayTimerOn()) HAL_TIM_Base_Start(&htim2);
+  if (!Main_IsPlayTimerOn())
+  {
+    HAL_TIM_Base_Start(&htim1);
+  }
 }
 void Main_StopPlayTimer()
 {
-  if (Main_IsPlayTimerOn()) HAL_TIM_Base_Stop(&htim2);
+  if (Main_IsPlayTimerOn())
+  {
+    HAL_TIM_Base_Stop(&htim2);
+    HAL_TIM_Base_Stop(&htim3);
+  }
 }
 void ConvertS16LEStereoToPWM(uint8_t *Buffer, uint16_t *Target_L, uint16_t *Target_R, size_t Count)
 {
