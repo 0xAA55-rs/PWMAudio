@@ -215,6 +215,7 @@ TIM2.OCFastMode_PWM-PWM\ Generation2\ CH2=TIM_OCFAST_DISABLE
 TIM2.Period=1499
 TIM2.Pulse-PWM\ Generation1\ CH1=0
 TIM2.Pulse-PWM\ Generation2\ CH2=0
+TIM3.Period=1499
 TIM3.AutoReloadPreload=TIM_AUTORELOAD_PRELOAD_ENABLE
 TIM3.Channel-PWM\ Generation3\ CH3=TIM_CHANNEL_3
 TIM3.Channel-PWM\ Generation4\ CH4=TIM_CHANNEL_4
