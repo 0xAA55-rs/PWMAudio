@@ -92,8 +92,12 @@ extern USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_FS;
 /* USER CODE BEGIN EXPORTED_VARIABLES */
 extern uint16_t pwm_ch1_buffer[BUFFER_SIZE];
 extern uint16_t pwm_ch2_buffer[BUFFER_SIZE];
+extern uint16_t pwm_ch3_buffer[BUFFER_SIZE];
+extern uint16_t pwm_ch4_buffer[BUFFER_SIZE];
 extern uint16_t* pwm_ch1_buffer_half;
 extern uint16_t* pwm_ch2_buffer_half;
+extern uint16_t* pwm_ch3_buffer_half;
+extern uint16_t* pwm_ch4_buffer_half;
 extern USBD_AUDIO_HandleTypeDef haudio;
 extern int usb_connected;
 extern int volume_all;
