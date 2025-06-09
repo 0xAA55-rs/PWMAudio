@@ -249,6 +249,8 @@ int main(void)
   UART_StartReceive();
   memset(pwm_ch1_buffer, 0, sizeof pwm_ch1_buffer);
   memset(pwm_ch2_buffer, 0, sizeof pwm_ch2_buffer);
+  memset(pwm_ch3_buffer, 0, sizeof pwm_ch3_buffer);
+  memset(pwm_ch4_buffer, 0, sizeof pwm_ch4_buffer);
   HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_CPLT_CB_ID, MainDMAOnCplt);
   HAL_DMA_RegisterCallback(&hdma_tim2_ch1, HAL_DMA_XFER_HALFCPLT_CB_ID, MainDMAOnHalf);
   __HAL_TIM_ENABLE_DMA(&htim2, TIM_DMA_CC1 | TIM_DMA_CC2);
