@@ -204,6 +204,8 @@ static int8_t AUDIO_AudioCmd_FS(size_t offset, uint8_t cmd)
       break;
 
     case AUDIO_CMD_PLAY:
+      if (!offset) HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+      else HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
       break;
 
     case AUDIO_CMD_STOP:
